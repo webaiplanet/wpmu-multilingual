@@ -1,3 +1,11 @@
+## 0.9.8.9 - 2026-07-24
+
+- 新增 taxonomy term 本体翻译开关，可分别控制是否翻译 term `name` 和 `description`。
+- 开关默认关闭，关闭时继续只复制源站 term 文本，不影响 0.9.8.8 的 CRUD 同步行为。
+- 开启后，term 新增/编辑同步到目标站时，OpenAI 兼容引擎翻译勾选字段，繁体中文目标可走 OpenCC 转换。
+- `slug` 固定保持源站同步，不自动翻译，避免 URL 不稳定。
+- manual 或不支持的引擎会保留源站文本并记录 `term_translation_skipped`；翻译失败记录 `term_translation_error`，但不阻断 term 同步。
+
 ## 0.9.8.8 - 2026-07-24
 
 - 新增 taxonomy term 本体 CRUD 同步，源站新增、编辑、删除 `sync_taxonomies` 白名单内的分类、标签和自定义 taxonomy term 时同步到启用目标站。

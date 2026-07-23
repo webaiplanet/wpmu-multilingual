@@ -90,6 +90,14 @@
 - 任务表迁移仅新增 `change_manifest`、`translated_content`，不重建关系、不修改文章 ID 或历史 URL。
 - 两组事务回滚测试通过：未翻译目标只同步变化 Meta 并进入 `pending`；已翻译目标保留旧译文并进入 `translated_update_pending`；Agent Payload 均只包含变化字段，测试残留为 0。
 
+### 2026-07-24 / 0.9.8.9 taxonomy term 翻译开关
+
+- 新增 `translate_term_name` 和 `translate_term_description` 设置，默认关闭。
+- 后台“内容类型”页新增分类/标签本体翻译开关。
+- term 同步时可按目标语言翻译 `name` / `description`，`slug` 仍固定同步源站。
+- OpenAI 兼容引擎复用现有纯文本翻译；繁体中文目标语言可走 OpenCC 转换。
+- manual 或不支持引擎保留源文并记录跳过日志；翻译失败记录错误但不阻断 term 同步。
+
 ### 2026-07-21 / 0.9.8.6 slug 冲突中文尾标
 
 - 新建冲突目标的 fallback slug 从 `源slug-源文章ID` 调整为 `源slug-源文章ID-和源站id重复`。

@@ -161,6 +161,8 @@ if (!trait_exists('WPMU_ML_Core_Admin_Actions_Trait')) {
             $settings['sync_taxonomies'] = $this->textarea_to_array($_POST['sync_taxonomies'] ?? '');
             $settings['excluded_taxonomies'] = [];
         }
+        $settings['translate_term_name'] = !empty($_POST['translate_term_name']) ? 1 : 0;
+        $settings['translate_term_description'] = !empty($_POST['translate_term_description']) ? 1 : 0;
 
         $this->persist_network_settings($settings);
         wp_safe_redirect(network_admin_url('admin.php?page=wpmu-multilingual&tab=types&updated=1'));

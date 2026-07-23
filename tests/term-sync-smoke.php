@@ -10,6 +10,9 @@ $source_blog_id = absint($settings['source_blog_id'] ?? 0);
 if (!$source_blog_id) {
     throw new RuntimeException('source_blog_id is not configured.');
 }
+if (!empty($settings['translate_term_name']) || !empty($settings['translate_term_description'])) {
+    throw new RuntimeException('term translation switches must be disabled for this non-API smoke test.');
+}
 
 $source_site = $wpdb->get_row($wpdb->prepare(
     "SELECT * FROM {$wpdb->base_prefix}wpmu_ml_sites WHERE blog_id = %d LIMIT 1",

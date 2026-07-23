@@ -360,6 +360,11 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
             echo '<p class="description">只同步勾选的分类法关系，例如 category、post_tag、各类 xxx_category；没勾选的分类法默认不处理。</p>';
             echo '<textarea name="sync_taxonomies_manual" rows="2" placeholder="额外补充，每行一个 taxonomy">' . esc_textarea($this->manual_items_not_in_candidates($selected_taxonomies, $taxonomies)) . '</textarea>';
             echo '</td></tr>';
+            echo '<tr><th>分类/标签本体翻译</th><td>';
+            echo '<label style="display:inline-block;margin-inline-end:16px;margin-block-end:8px"><input type="checkbox" name="translate_term_name" value="1" ' . checked(!empty($settings['translate_term_name']), true, false) . '> 翻译分类/标签名称 name</label>';
+            echo '<label style="display:inline-block;margin-inline-end:16px;margin-block-end:8px"><input type="checkbox" name="translate_term_description" value="1" ' . checked(!empty($settings['translate_term_description']), true, false) . '> 翻译分类/标签描述 description</label>';
+            echo '<p class="description">默认关闭。开启后，源站 term 新增/编辑同步到目标站时会按目标语言翻译勾选字段；slug 仍固定同步源站，不自动翻译。</p>';
+            echo '</td></tr>';
             echo '</tbody></table>';
             submit_button('保存内容类型设置');
             echo '</form>';

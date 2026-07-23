@@ -329,6 +329,22 @@ if (!trait_exists('WPMU_ML_Core_Term_Sync_Trait')) {
                 $args['parent'] = $parent_target_id;
             }
 
+            $translation = $this->translate_target_term_args($source_term, $source_site, $target, $args, $event);
+            if (is_wp_error($translation)) {
+                $this->log('warning', 'term_translation_error', 'term 翻译失败，已保留源站文本完成同步。', [
+                    'source_blog_id' => $source_blog_id,
+                    'source_term_id' => $source_term_id,
+                    'target_blog_id' => $target_blog_id,
+                    'taxonomy' => $taxonomy,
+                    'event' => $event,
+                    'error' => $translation->get_error_message(),
+                ]);
+                $translated_fields = [];
+            } else {
+                $args = (array)($translation['args'] ?? $args);
+                $translated_fields = (array)($translation['translated_fields'] ?? []);
+            }
+
             $created = false;
             if ($target_term) {
                 $args['name'] = (string)$source_term->name;
@@ -374,7 +390,7 @@ if (!trait_exists('WPMU_ML_Core_Term_Sync_Trait')) {
                 $target_term_id,
                 sanitize_key((string)($source_site['lang_slug'] ?? '')),
                 sanitize_key((string)($target['lang_slug'] ?? '')),
-                'synced'
+                $translated_fields ? 'translated' : 'synced'
             );
 
             if ($repaired) {
@@ -392,7 +408,110 @@ if (!trait_exists('WPMU_ML_Core_Term_Sync_Trait')) {
                 'target_term_id' => $target_term_id,
                 'created' => $created ? 1 : 0,
                 'repaired' => $repaired ? 1 : 0,
+                'translated_fields' => $translated_fields,
                 'resolution' => $resolution,
+            ];
+        }
+
+        private function translate_target_term_args($source_term, $source_site, $target, $args, $event = 'sync')
+        {
+            $settings = $this->get_settings();
+            $translate_name = !empty($settings['translate_term_name']);
+            $translate_description = !empty($settings['translate_term_description']);
+            if ((!$translate_name && !$translate_description) || (string)$event === 'parent') {
+                return [
+                    'args' => (array)$args,
+                    'translated_fields' => [],
+                    'engine' => '',
+                ];
+            }
+            if (!$source_term instanceof WP_Term) {
+                return new WP_Error('wpmu_ml_term_translation_source_invalid', '源 term 参数无效。');
+            }
+
+            $target_lang = sanitize_key((string)($target['lang_slug'] ?? ''));
+            $target_blog_id = absint($target['blog_id'] ?? 0);
+            if ($target_lang === '' || !$target_blog_id) {
+                return new WP_Error('wpmu_ml_term_translation_target_invalid', '目标语言或目标站参数无效。');
+            }
+
+            $route = $this->resolve_translation_route($target_lang, 'taxonomy_term');
+            $engine = sanitize_key((string)($route['engine'] ?? 'manual'));
+            $translated_fields = [];
+
+            if ($engine === 'openai') {
+                $api_key = trim((string)($settings['openai_api_key'] ?? ''));
+                if ($api_key === '') {
+                    return new WP_Error('wpmu_ml_term_translation_openai_key_missing', 'OpenAI 兼容 API Key 为空。');
+                }
+                $target_context = $this->get_language_prompt_context($target_lang, $target_blog_id);
+                $source_context = $this->get_language_prompt_context('', absint($source_site['blog_id'] ?? 0));
+                $settings['openai_target_language_context'] = $target_context;
+                $settings['openai_source_language_context'] = $source_context;
+                $settings = $this->apply_openai_language_profile($settings, sanitize_key((string)($target_context['lang_slug'] ?? $target_lang)));
+                if (!empty($route['model'])) {
+                    $settings['openai_model'] = trim((string)$route['model']);
+                }
+                $target_label = (string)($target_context['prompt_label'] ?? $target_lang);
+                if ($translate_name && (string)$source_term->name !== '') {
+                    $translated = $this->openai_translate_plain_text(
+                        (string)$source_term->name,
+                        $target_label,
+                        $settings,
+                        'Translate this WordPress taxonomy term name into the configured target language. Keep it concise. Preserve brands, product names, acronyms, numbers and technical terms when appropriate. Return ONLY valid JSON with key: text.'
+                    );
+                    if (is_wp_error($translated)) {
+                        return $translated;
+                    }
+                    $args['name'] = (string)$translated;
+                    $translated_fields[] = 'name';
+                }
+                if ($translate_description && (string)$source_term->description !== '') {
+                    $translated = $this->openai_translate_plain_text(
+                        (string)$source_term->description,
+                        $target_label,
+                        $settings,
+                        'Translate this WordPress taxonomy term description into the configured target language. Preserve facts, brands, product names, URLs, numbers and technical terms. Return ONLY valid JSON with key: text.'
+                    );
+                    if (is_wp_error($translated)) {
+                        return $translated;
+                    }
+                    $args['description'] = (string)$translated;
+                    $translated_fields[] = 'description';
+                }
+            } elseif ($this->is_opencc_engine($engine)) {
+                $settings['opencc_config'] = $this->get_opencc_config_for_engine($engine, $settings);
+                if ($translate_name && (string)$source_term->name !== '') {
+                    $converted = $this->opencc_convert_text((string)$source_term->name, $settings);
+                    if ($converted === false) {
+                        return new WP_Error('wpmu_ml_term_translation_opencc_failed', 'OpenCC 转换 term name 失败。');
+                    }
+                    $args['name'] = (string)$converted;
+                    $translated_fields[] = 'name';
+                }
+                if ($translate_description && (string)$source_term->description !== '') {
+                    $converted = $this->opencc_convert_text((string)$source_term->description, $settings);
+                    if ($converted === false) {
+                        return new WP_Error('wpmu_ml_term_translation_opencc_failed', 'OpenCC 转换 term description 失败。');
+                    }
+                    $args['description'] = (string)$converted;
+                    $translated_fields[] = 'description';
+                }
+            } else {
+                $this->log('info', 'term_translation_skipped', '当前目标语言翻译引擎不支持自动 term 翻译，已保留源站文本。', [
+                    'source_blog_id' => absint($source_site['blog_id'] ?? 0),
+                    'source_term_id' => absint($source_term->term_id),
+                    'target_blog_id' => $target_blog_id,
+                    'target_lang' => $target_lang,
+                    'taxonomy' => sanitize_key((string)$source_term->taxonomy),
+                    'engine' => $engine,
+                ]);
+            }
+
+            return [
+                'args' => (array)$args,
+                'translated_fields' => array_values(array_unique($translated_fields)),
+                'engine' => $engine,
             ];
         }
 
