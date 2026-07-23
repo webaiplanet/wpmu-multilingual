@@ -901,7 +901,7 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
             echo '</style>';
 
             echo '<p class="wpmu-ml-engine-note wpmu-ml-engine-primary-note">这里已经从“翻译设置”中独立出来。上方使用与“翻译设置”一致的一级选项卡；每个引擎内部仍可继续增加自己的二级选项卡和语言级配置。</p>';
-            echo '<div class="notice notice-info inline"><p>当前内置主翻译入口为：人工翻译、OpenAI 兼容、Agent API。OpenCC 不作为默认翻译引擎显示，只在繁体目标语言中作为高性能简繁转换方式出现。Agent API 不在 WordPress 内部调用模型，但会通过 <code>/agent/rules</code> 和任务 payload 向外部 Agent 提供本插件统一维护的翻译规则与术语库。</p></div>';
+            echo '<div class="notice notice-info inline"><p>当前内置主翻译入口为：人工翻译、OpenAI 兼容、Agent API。OpenCC 不作为默认翻译引擎显示；只有源站识别为简体中文、目标语言为繁体中文时，才在目标语言规则中显示为高性能简繁转换方式。Agent API 不在 WordPress 内部调用模型，但会通过 <code>/agent/rules</code> 和任务 payload 向外部 Agent 提供本插件统一维护的翻译规则与术语库。</p></div>';
 
             echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" id="wpmu-ml-engine-settings-form">';
             echo '<input type="hidden" name="action" value="wpmu_ml_save_translation_settings">';
@@ -917,7 +917,7 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
             foreach ($default_engines as $key => $label) {
                 echo '<option value="' . esc_attr($key) . '" ' . selected($default_engine, $key, false) . '>' . esc_html($label) . '</option>';
             }
-            echo '</select><p class="description">默认下拉不显示 OpenCC。非繁体语言通常使用 OpenAI 兼容或 Agent API；繁体语言可在下方按目标语言选择 s2twp / s2tw / s2hk / s2t。</p></td></tr>';
+            echo '</select><p class="description">默认下拉不显示 OpenCC。非繁体语言通常使用 OpenAI 兼容或 Agent API；只有源站为简体中文且目标语言为繁体中文时，下方目标语言规则才会显示 s2twp / s2tw / s2hk / s2t。</p></td></tr>';
             echo '<tr><th>默认完成后状态</th><td><select class="wpmu-ml-select" name="translation_complete_status">';
             foreach ($status_labels as $value => $label) {
                 echo '<option value="' . esc_attr($value) . '" ' . selected($settings['translation_complete_status'], $value, false) . '>' . esc_html($label) . '</option>';
@@ -962,7 +962,7 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
                 echo '</tr>';
             }
             echo '</tbody></table>';
-            echo '<p class="description wpmu-ml-route-help">说明：如果某个目标语言单独设置了翻译方式，则目标语言规则会优先于文章类型规则；如果需要指定“某语言下某文章类型”的例外，请使用下方“精确覆盖规则”。繁体目标语言可直接选择 OpenCC，速度最快；如需要语义重写、SEO 母语化表达或外部 Agent 工作流，可选择 OpenAI 兼容或 Agent API。</p>';
+            echo '<p class="description wpmu-ml-route-help">说明：如果某个目标语言单独设置了翻译方式，则目标语言规则会优先于文章类型规则；如果需要指定“某语言下某文章类型”的例外，请使用下方“精确覆盖规则”。OpenCC 只用于“简体中文源站 → 繁体中文目标站”的简繁转换；其他源语言请使用 OpenAI 兼容、Agent API 或人工翻译。</p>';
             echo '</details>';
 
             echo '<h3>按文章类型设置翻译方式 / 模型</h3>';
@@ -1195,13 +1195,13 @@ curl -s -H "Authorization: Bearer TOOLS_KEY" "' . esc_html(home_url('/wp-json/wp
 
             echo '<div class="wpmu-ml-engine-panel' . ($active_tab === 'opencc' ? ' is-active' : '') . '" data-panel="opencc">';
             echo '<h2>OpenCC</h2>';
-            echo '<p class="description">OpenCC 只负责简繁转换，不调用模型。具体使用 s2twp / s2tw / s2hk / s2t 由“默认与路由”的目标语言规则决定。</p>';
+            echo '<p class="description">OpenCC 只负责简体中文到繁体中文的文字转换，不调用模型。只有源站识别为简体中文、目标语言为繁体中文时，才会在“默认与路由”的目标语言规则里显示 s2twp / s2tw / s2hk / s2t。</p>';
             echo '<table class="form-table"><tbody>';
             echo '<tr><th>OpenCC 命令路径</th><td><input type="text" name="opencc_binary_path" value="' . esc_attr($settings['opencc_binary_path']) . '" class="regular-text" placeholder="自动检测：/usr/bin/opencc 或 opencc"><p class="description">留空自动检测。转换配置不再全局设置，而是在繁体目标语言的翻译方式里选择 s2twp / s2tw / s2hk / s2t。</p></td></tr>';
             echo '<tr><th>转换文章自定义字段</th><td><label><input type="checkbox" name="opencc_convert_meta" value="1" ' . checked(!empty($settings['opencc_convert_meta']), true, false) . '> 转换目标文章的可翻译 postmeta / ACF 字段值</label></td></tr>';
             echo '<tr><th>转换 SEO 字段</th><td><label><input type="checkbox" name="opencc_convert_seo_meta" value="1" ' . checked(!empty($settings['opencc_convert_seo_meta']), true, false) . '> 转换 Rank Math / Yoast / AIOSEO 的标题和描述字段</label></td></tr>';
             echo '</tbody></table>';
-            echo '<p class="description">推荐：<code>zh-hant</code> 选 <code>opencc_s2twp</code>；香港用词需求可选 <code>opencc_s2hk</code>。</p>';
+            echo '<p class="description">推荐：简体中文源站转换到 <code>zh-hant</code> 时选 <code>opencc_s2twp</code>；香港用词需求可选 <code>opencc_s2hk</code>。如果源站不是简体中文，不应使用 OpenCC。</p>';
             echo '</div>';
 
             echo '<div class="wpmu-ml-engine-panel' . ($active_tab === 'manual' ? ' is-active' : '') . '" data-panel="manual">';
@@ -1566,13 +1566,14 @@ wp wpmu-ml translate --job_id=62 --allow-root --skip-themes</pre>';
                     return true;
                 }
             }
-            // Traditional-Chinese targets default to OpenCC unless explicitly routed elsewhere.
+            // Simplified-Chinese source + Traditional-Chinese targets default to OpenCC unless
+            // explicitly routed elsewhere. Other source languages must not require OpenCC.
             foreach ((array)$this->get_i18n_sites() as $site) {
                 if (empty($site['enabled']) || (int)($site['blog_id'] ?? 0) === (int)($settings['source_blog_id'] ?? 0)) {
                     continue;
                 }
                 $lang = sanitize_key((string)($site['lang_slug'] ?? ''));
-                if (!$this->is_traditional_chinese_lang($lang)) {
+                if (!$this->should_offer_opencc_for_target_lang($lang, $settings)) {
                     continue;
                 }
                 $configured = sanitize_key((string)((array)($settings['translation_engines_by_lang'] ?? [])[$lang] ?? ''));

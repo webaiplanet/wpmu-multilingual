@@ -3,7 +3,7 @@
  * Plugin Name: WPMU多语言
  * Plugin URI: https://github.com/webaiplanet/wpmu-multilingual
  * Description: WordPress Multisite 多语言关联、hreflang、自动同步、翻译队列、OpenCC、OpenAI 兼容与 Agent API 翻译插件。建议网络启用。
- * Version: 0.9.8.10
+ * Version: 0.9.8.11
  * Author: WPMU多语言
  * Text Domain: wpmu-multilingual
  * Network: true
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('WPMU_ML_VERSION', '0.9.8.10');
+define('WPMU_ML_VERSION', '0.9.8.11');
 define('WPMU_ML_PLUGIN_FILE', __FILE__);
 define('WPMU_ML_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WPMU_ML_PLUGIN_URL', plugin_dir_url(__FILE__));

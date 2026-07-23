@@ -26,7 +26,7 @@ if (!trait_exists('WPMU_ML_Core_Engine_Routing_Trait')) {
     private function get_translation_engines_for_lang($target_lang = '') {
         $target_lang = sanitize_key($target_lang);
         $engines = $this->get_default_translation_engines();
-        if ($this->is_traditional_chinese_lang($target_lang)) {
+        if ($this->should_offer_opencc_for_target_lang($target_lang)) {
             $engines = array_merge($engines, $this->get_opencc_translation_engines());
         }
         return $this->append_registered_translation_engines($engines, 'language', $target_lang);
@@ -77,6 +77,57 @@ if (!trait_exists('WPMU_ML_Core_Engine_Routing_Trait')) {
         return (bool)preg_match('/^zh-(hant|tw|hk|mo)(?:-|$)/', $lang);
     }
 
+    private function is_simplified_chinese_lang($lang) {
+        $lang = strtolower(str_replace('_', '-', sanitize_key((string)$lang)));
+        if ($lang === '') {
+            return false;
+        }
+        if (in_array($lang, ['zh','zh-hans','zh-cn','zh-sg','zh-my','hans','cn','sg'], true)) {
+            return true;
+        }
+        return (bool)preg_match('/^zh-(hans|cn|sg|my)(?:-|$)/', $lang);
+    }
+
+    private function source_language_supports_opencc_s2t($settings = null) {
+        global $wpdb;
+        $settings = is_array($settings) ? $settings : $this->get_settings();
+        $source_blog_id = absint($settings['source_blog_id'] ?? 0);
+        if (!$source_blog_id) {
+            return false;
+        }
+
+        $site = $wpdb->get_row($wpdb->prepare(
+            "SELECT lang_slug, locale, translation_locale, hreflang FROM {$this->tables['sites']} WHERE blog_id = %d LIMIT 1",
+            $source_blog_id
+        ), ARRAY_A);
+
+        $candidates = [];
+        if (is_array($site)) {
+            $candidates[] = (string)($site['translation_locale'] ?? '');
+            $candidates[] = (string)($site['locale'] ?? '');
+            $candidates[] = (string)($site['hreflang'] ?? '');
+            $candidates[] = (string)($site['lang_slug'] ?? '');
+        }
+
+        $live_locale = $this->get_site_wp_locale($source_blog_id);
+        if ($live_locale !== '') {
+            $candidates[] = $live_locale;
+            $candidates[] = $this->locale_to_hreflang($live_locale);
+        }
+
+        foreach ($candidates as $candidate) {
+            if ($this->is_simplified_chinese_lang($candidate)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function should_offer_opencc_for_target_lang($target_lang, $settings = null) {
+        return $this->is_traditional_chinese_lang($target_lang)
+            && $this->source_language_supports_opencc_s2t($settings);
+    }
+
     private function is_opencc_engine($engine) {
         $engine = sanitize_key($engine);
         return strpos($engine, 'opencc_') === 0;
@@ -97,7 +148,7 @@ if (!trait_exists('WPMU_ML_Core_Engine_Routing_Trait')) {
         $engines_by_lang = is_array($settings['translation_engines_by_lang']) ? $settings['translation_engines_by_lang'] : [];
         $engine = sanitize_key($engines_by_lang[$target_lang] ?? '');
         if (!$engine) {
-            if ($this->is_traditional_chinese_lang($target_lang)) {
+            if ($this->should_offer_opencc_for_target_lang($target_lang, $settings)) {
                 $engine = $fallback ?: 'opencc_s2twp';
             } else {
                 $engine = $fallback ?: $settings['translation_default_engine'];
@@ -126,7 +177,7 @@ if (!trait_exists('WPMU_ML_Core_Engine_Routing_Trait')) {
         $route_key = $this->get_translation_route_key($target_lang, $post_type);
 
         $default_engine = $this->normalize_translation_engine_key($settings['translation_default_engine'] ?? 'manual', $target_lang);
-        if ($default_engine === 'manual' && $this->is_traditional_chinese_lang($target_lang)) {
+        if ($default_engine === 'manual' && $this->should_offer_opencc_for_target_lang($target_lang, $settings)) {
             $default_engine = 'opencc_s2twp';
         }
         $default_status = $this->normalize_translation_status($settings['translation_complete_status'] ?? 'pending');
@@ -175,9 +226,9 @@ if (!trait_exists('WPMU_ML_Core_Engine_Routing_Trait')) {
         }
 
         if ($engine === '') {
-            if ($this->is_traditional_chinese_lang($target_lang)) {
+            if ($this->should_offer_opencc_for_target_lang($target_lang, $settings)) {
                 $engine = 'opencc_s2twp';
-                $reason = 'traditional_chinese_fallback';
+                $reason = 'simplified_to_traditional_chinese_fallback';
                 $profile = $target_lang;
             } else {
                 $engine = $default_engine;
