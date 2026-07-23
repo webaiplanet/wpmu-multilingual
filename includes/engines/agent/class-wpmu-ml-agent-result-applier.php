@@ -54,7 +54,9 @@ final class WPMU_ML_Agent_Result_Applier {
         }
 
         switch_to_blog((int)$job['target_blog_id']);
+        update_post_meta((int)$job['target_post_id'], '_wpmu_ml_agent_result_writeback_running', '1');
         $updated = wp_update_post($postarr, true);
+        delete_post_meta((int)$job['target_post_id'], '_wpmu_ml_agent_result_writeback_running');
         if (is_wp_error($updated)) {
             restore_current_blog();
             return $updated;
@@ -90,7 +92,7 @@ final class WPMU_ML_Agent_Result_Applier {
         }
         foreach ($expected_post as $property => $expected_value) {
             $actual_value = isset($written_post->{$property}) ? (string)$written_post->{$property} : '';
-            if (!$this->writeback_values_equal($expected_value, $actual_value)) {
+            if (!$this->post_field_values_equal($property, $expected_value, $actual_value)) {
                 restore_current_blog();
                 return new WP_Error(
                     'wpmu_ml_agent_post_writeback_mismatch',
@@ -236,6 +238,16 @@ final class WPMU_ML_Agent_Result_Applier {
             return false;
         }
         return false;
+    }
+
+    private function post_field_values_equal($property, $expected, $actual) {
+        if (in_array((string)$property, ['post_content', 'post_excerpt'], true)) {
+            $expected = wp_kses_normalize_entities((string)$expected);
+            $actual = wp_kses_normalize_entities((string)$actual);
+            $expected = preg_replace('/\s*\/>/', ' />', $expected);
+            $actual = preg_replace('/\s*\/>/', ' />', $actual);
+        }
+        return $this->writeback_values_equal($expected, $actual);
     }
 
     private function writeback_values_equal($expected, $actual) {

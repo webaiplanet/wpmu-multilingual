@@ -94,6 +94,9 @@ if (!trait_exists('WPMU_ML_Core_Sync_Trait')) {
         if (!$this->is_managed_post_type($post->post_type)) {
             return;
         }
+        if ((string)get_post_meta((int)$post->ID, '_wpmu_ml_agent_result_writeback_running', true) === '1') {
+            return;
+        }
         global $wpdb;
         $relation = $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM {$this->tables['posts']} WHERE target_blog_id = %d AND target_post_id = %d LIMIT 1",
