@@ -1,5 +1,9 @@
 # WPMU Multilingual
 
+Languages: [简体中文](#简体中文) | [English](#english)
+
+## 简体中文
+
 WPMU Multilingual 是一个面向 WordPress Multisite 的多语言插件，用于在多个子站之间建立文章、分类、标签和语言切换关系，并提供 hreflang、自动同步、翻译队列、OpenCC 和 OpenAI 兼容翻译能力。
 
 这个仓库是插件源码，不绑定某个具体网站。
@@ -92,6 +96,105 @@ wp wpmu-ml translate --limit=1 --lang=en --allow-root --skip-themes
 - 更新日志：[`docs/changelog/CHANGELOG.md`](docs/changelog/CHANGELOG.md)
 - 架构与翻译规则：[`docs/reference/ARCHITECTURE_AND_TRANSLATION_RULES.md`](docs/reference/ARCHITECTURE_AND_TRANSLATION_RULES.md)
 - 测试和处理报告：[`docs/reports/`](docs/reports/)
+
+## License
+
+GPL-2.0-or-later. See [`LICENSE`](LICENSE).
+
+## English
+
+WPMU Multilingual is a WordPress Multisite multilingual plugin. It connects language sites, manages post and taxonomy relationships, outputs `alternate hreflang`, synchronizes source content to target language sites, and supports translation workflows through OpenCC, OpenAI-compatible APIs, Agent APIs, and manual processing.
+
+This repository contains the plugin source code and is not tied to any specific website.
+
+## Use Cases
+
+- One WordPress Multisite network where each language uses a separate subsite.
+- Source-language posts need to be linked with their target-language versions.
+- Frontend language switchers and SEO `alternate hreflang` output are required.
+- Source post updates need to be synchronized to target language sites.
+- OpenAI-compatible translation, OpenCC conversion, or external Agent workflows are needed.
+
+## Features
+
+- Language site configuration: language slug, Locale, hreflang, sort order, source site, and frontend default site.
+- Post relationship management: source-to-target post relations, audits, and repair tools.
+- Automatic synchronization: title, content, excerpt, slug, meta, and taxonomy relationships.
+- Incremental updates: translated posts can keep existing translations while recording changed fields.
+- Taxonomy term synchronization: create, update, and delete terms across language sites.
+- Term translation switches: separately control term `name` and `description` translation; `slug` stays synchronized from the source by default.
+- Language switcher: code-based and menu-based rendering, flags, and unpublished-language handling.
+- hreflang output: only published and indexable target posts are included.
+- Translation queue: OpenAI-compatible APIs, OpenCC, Agent API, and manual workflows.
+- WP-CLI tools: relation audits, relation repair, queue processing, and regression tests.
+
+## Installation
+
+1. Place the plugin directory at:
+
+   ```text
+   wp-content/plugins/wpmu-multilingual/
+   ```
+
+2. Network-activate the plugin in WordPress Multisite.
+
+3. Open the network admin plugin settings page and configure language sites.
+
+Network activation is recommended.
+
+## Basic Setup
+
+1. Enable language subsites and choose the source site and frontend default site.
+2. Select translatable or shared post types.
+3. Select taxonomies to synchronize, such as `category`, `post_tag`, or custom taxonomies.
+4. Configure automatic synchronization fields.
+5. Configure the language switcher render mode and unpublished-language behavior.
+6. Configure OpenAI-compatible APIs, OpenCC, or Agent API settings if machine translation is needed.
+
+## Language Switcher
+
+Use this in a theme template:
+
+```php
+if (function_exists('wpmu_ml_language_switcher')) {
+    wpmu_ml_language_switcher();
+}
+```
+
+You can also enable menu mode in the plugin settings and add the language switcher from WordPress “Appearance → Menus”.
+
+## WP-CLI Examples
+
+Audit post relations:
+
+```bash
+wp wpmu-ml audit-relations --summary --allow-root --skip-themes
+```
+
+Preview relation repair:
+
+```bash
+wp wpmu-ml reconcile-relations --target_blog_id=TARGET_SITE_ID --limit=500 --allow-root --skip-themes
+```
+
+Process one translation queue item:
+
+```bash
+wp wpmu-ml translate --limit=1 --lang=en --allow-root --skip-themes
+```
+
+## Current Version
+
+Current development version: `0.9.8.10`
+
+The plugin is still under active development. Test language sites, post relations, synchronization, and translation queues in a staging environment before production use.
+
+## Documentation
+
+- Documentation index: [`docs/INDEX.md`](docs/INDEX.md)
+- Changelog: [`docs/changelog/CHANGELOG.md`](docs/changelog/CHANGELOG.md)
+- Architecture and translation rules: [`docs/reference/ARCHITECTURE_AND_TRANSLATION_RULES.md`](docs/reference/ARCHITECTURE_AND_TRANSLATION_RULES.md)
+- Reports: [`docs/reports/`](docs/reports/)
 
 ## License
 
