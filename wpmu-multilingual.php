@@ -1,12 +1,14 @@
 <?php
 /**
  * Plugin Name: WPMU多语言
- * Plugin URI: https://example.com/
+ * Plugin URI: https://github.com/webaiplanet/wpmu-multilingual
  * Description: WordPress Multisite 多语言关联、hreflang、自动同步、翻译队列、OpenCC、OpenAI 兼容与 Agent API 翻译插件。建议网络启用。
  * Version: 0.9.8.8
  * Author: WPMU多语言
  * Text Domain: wpmu-multilingual
  * Network: true
+ * License: GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
 if (!defined('ABSPATH')) {
