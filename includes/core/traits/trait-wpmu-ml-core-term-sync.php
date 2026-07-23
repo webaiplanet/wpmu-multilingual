@@ -345,18 +345,19 @@ if (!trait_exists('WPMU_ML_Core_Term_Sync_Trait')) {
                 $translated_fields = (array)($translation['translated_fields'] ?? []);
             }
 
+            $target_term_name = array_key_exists('name', $args) ? (string)$args['name'] : (string)$source_term->name;
             $created = false;
             if ($target_term) {
-                $args['name'] = (string)$source_term->name;
+                $args['name'] = $target_term_name;
                 $written = wp_update_term($target_term_id, $taxonomy, wp_slash($args));
             } else {
-                $written = wp_insert_term((string)$source_term->name, $taxonomy, wp_slash($args));
+                $written = wp_insert_term($target_term_name, $taxonomy, wp_slash($args));
                 if (is_wp_error($written) && $written->get_error_code() === 'term_exists') {
                     $error_data = $written->get_error_data();
                     $existing_id = is_array($error_data) ? absint($error_data['term_id'] ?? 0) : absint($error_data);
                     if ($existing_id) {
                         $target_term_id = $existing_id;
-                        $args['name'] = (string)$source_term->name;
+                        $args['name'] = $target_term_name;
                         $written = wp_update_term($target_term_id, $taxonomy, wp_slash($args));
                         $resolution = 'adopt_by_term_exists';
                         $repaired = true;

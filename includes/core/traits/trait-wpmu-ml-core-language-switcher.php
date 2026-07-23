@@ -1462,7 +1462,7 @@ if (!trait_exists('WPMU_ML_Core_Language_Switcher_Trait')) {
             restore_current_blog();
             $is_unpublished = $status !== 'publish';
             if ($is_unpublished) {
-                if (!$include_unpublished_notice && !empty($settings['hide_unpublished'])) {
+                if (!$include_unpublished_notice) {
                     continue;
                 }
                 if ($include_unpublished_notice) {

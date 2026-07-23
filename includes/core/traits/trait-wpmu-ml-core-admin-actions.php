@@ -137,7 +137,10 @@ if (!trait_exists('WPMU_ML_Core_Admin_Actions_Trait')) {
         $this->verify_network_action();
         $settings = $this->get_settings();
         $settings['enable_hreflang'] = !empty($_POST['enable_hreflang']) ? 1 : 0;
-        $settings['hide_unpublished'] = !empty($_POST['hide_unpublished']) ? 1 : 0;
+        // Legacy option kept for backward compatibility. The public UI now manages
+        // unpublished language display from the Language Switcher tab only; hreflang
+        // output is always limited to published/indexable alternates.
+        $settings['hide_unpublished'] = 1;
         $settings['x_default_mode'] = in_array(($_POST['x_default_mode'] ?? 'front'), ['front','source','none'], true) ? $_POST['x_default_mode'] : 'front';
 
         // v0.4.0 起优先使用勾选式表单；兼容旧版 textarea 字段。

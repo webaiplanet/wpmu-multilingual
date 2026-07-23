@@ -90,6 +90,13 @@
 - 任务表迁移仅新增 `change_manifest`、`translated_content`，不重建关系、不修改文章 ID 或历史 URL。
 - 两组事务回滚测试通过：未翻译目标只同步变化 Meta 并进入 `pending`；已翻译目标保留旧译文并进入 `translated_update_pending`；Agent Payload 均只包含变化字段，测试残留为 0。
 
+### 2026-07-24 / 0.9.8.10 后台未发布语言配置清理
+
+- 移除“内容类型”页里旧的“隐藏未发布语言”checkbox，避免和“语言切换”页重复。
+- “语言切换”页保留唯一入口，并改名为“未发布语言处理”。
+- hreflang 固定只输出已发布且可索引的目标文章；语言切换器可单独选择隐藏未发布语言或显示提示弹窗。
+- 修正 term name 翻译写入被源站名称覆盖的问题。
+
 ### 2026-07-24 / 0.9.8.9 taxonomy term 翻译开关
 
 - 新增 `translate_term_name` 和 `translate_term_description` 设置，默认关闭。

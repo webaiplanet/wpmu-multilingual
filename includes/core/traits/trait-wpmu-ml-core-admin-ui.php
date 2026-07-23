@@ -275,12 +275,12 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
             echo '</div>';
             echo '<p class="description">旗帜图标来自 <code>assets/flags/4x3</code> 或 <code>assets/flags/1x1</code>。位置可选语言前或语言后，尺寸和圆角都按像素控制；圆角填 <code>0</code> 为直角，填 <code>999</code> 不支持，最大限制为 <code>32px</code>。</p>';
             echo '</td></tr>';
-            echo '<tr><th scope="row">隐藏未发布语言</th><td>';
+            echo '<tr><th scope="row">未发布语言处理</th><td>';
             echo '<select name="language_switcher_unpublished_policy">';
             echo '<option value="hide" ' . selected($unpublished_policy, 'hide', false) . '>隐藏语言</option>';
             echo '<option value="notice" ' . selected($unpublished_policy, 'notice', false) . '>显示提示</option>';
             echo '</select>';
-            echo '<p class="description">文章详情页遇到目标语言文章未发布时：“隐藏语言”会直接不显示该语言；“显示提示”会显示语言项，但点击后弹窗提示该语言版本暂未发布。</p>';
+            echo '<p class="description">只影响语言切换器。文章详情页遇到目标语言文章未发布时：“隐藏语言”会直接不显示该语言；“显示提示”会显示语言项，但点击后弹窗提示该语言版本暂未发布。hreflang 始终只输出已发布且可索引的目标文章。</p>';
             echo '</td></tr>';
             echo '<tr><th scope="row">当前状态</th><td>';
             echo $call_mode === 'menu' ? '<span class="wpmu-ml-ok">当前选择：菜单调用</span>' : '<span class="wpmu-ml-ok">当前选择：代码调用</span>';
@@ -296,7 +296,7 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
             echo '<p class="description">主题模板中可直接调用。插件负责当前语言、可切换语言、URL、hreflang/lang；主题负责 CSS、下拉效果和响应式。</p>';
             echo '<pre class="wpmu-ml-pre">&lt;?php\nif (function_exists(\'wpmu_ml_language_switcher\')) {\n    wpmu_ml_language_switcher([\n        \'display\' =&gt; \'full\',\n        \'class\'   =&gt; \'language-menu\',\n        \'flag_mode\' =&gt; \'before\',\n        \'flag_style\' =&gt; \'4x3\',\n        \'flag_size\' =&gt; 24,\n        \'flag_radius\' =&gt; 2,\n    ]);\n}\n?&gt;</pre>';
             echo '</td></tr>';
-            echo '<tr><th scope="row">显示设置</th><td><p class="description">后续代码调用专用的显示项会放这里，例如显示名称/简称、是否显示当前语言、是否隐藏未发布语言、结构类型、旗帜位置等。</p></td></tr>';
+            echo '<tr><th scope="row">显示设置</th><td><p class="description">后续代码调用专用的显示项会放这里，例如显示名称/简称、是否显示当前语言、未发布语言处理、结构类型、旗帜位置等。</p></td></tr>';
             echo '</tbody></table>';
             echo '</div>';
 
@@ -334,7 +334,6 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
             wp_nonce_field(self::NONCE_ACTION, self::NONCE_NAME);
             echo '<table class="form-table"><tbody>';
             echo '<tr><th>启用 hreflang</th><td><label><input type="checkbox" name="enable_hreflang" value="1" ' . checked($settings['enable_hreflang'], 1, false) . '> 前台自动输出 alternate hreflang</label></td></tr>';
-            echo '<tr><th>隐藏未发布语言</th><td><label><input type="checkbox" name="hide_unpublished" value="1" ' . checked($settings['hide_unpublished'], 1, false) . '> 语言切换器和 hreflang 只显示已发布目标文章</label></td></tr>';
             echo '<tr><th>x-default</th><td><select name="x_default_mode"><option value="front" ' . selected($settings['x_default_mode'], 'front', false) . '>前台默认站点</option><option value="source" ' . selected($settings['x_default_mode'], 'source', false) . '>源站</option><option value="none" ' . selected($settings['x_default_mode'], 'none', false) . '>不输出</option></select></td></tr>';
 
             $shared_selected_for_ui = array_values(array_unique(array_map('sanitize_key', (array)$settings['shared_post_types'])));
