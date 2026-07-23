@@ -133,7 +133,7 @@
 ### 2026-07-21 / 0.9.8.2 唯一约束与严格恢复
 
 - 索引迁移前关系总数：149,617；零目标 ID：0；重复目标组：0。
-- 关系表备份：`/home/www/likacloud-backups/wpmu-ml-post-relations-before-0.9.8.2-20260721.sql`，大小约 25 MB。
+- 关系表备份：`wpmu-multilingual/backups/wpmu-ml-post-relations-before-0.9.8.2-20260721.sql`，大小约 25 MB。
 - 备份 SHA-256：`c3729420f90d4b7f9aa8aabb33a659dd007ad720586f6ea26b6deaef39fd9c3a`。
 - 严格恢复 dry-run 扫描目标站 1：已有关系 1、候选 0、写入 0、冲突 0、错误 0。
 - 已验证使用 `--apply` 但缺少确认短语时拒绝执行，关系总数保持不变。

@@ -3,7 +3,7 @@
 ## 1. 审核结论
 
 审核时间：2026-07-21 03:56-04:00 GMT+8  
-审核对象：`/home/www/wwwroot/likacloud.787k.com/wp-content/plugins/wpmu-multilingual`  
+审核对象：`wpmu-multilingual/`  
 被审核文档：`docs/WPMU多语言插件_0.9.8.3关联改进与测试汇报.md`  
 插件版本：`0.9.8.3`
 

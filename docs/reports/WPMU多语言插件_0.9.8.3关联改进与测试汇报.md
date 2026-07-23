@@ -114,7 +114,7 @@ UNIQUE KEY target_unique (target_blog_id, target_post_id)
 数据库迁移前备份：
 
 ```text
-/home/www/likacloud-backups/wpmu-ml-post-relations-before-0.9.8.2-20260721.sql
+wpmu-multilingual/backups/wpmu-ml-post-relations-before-0.9.8.2-20260721.sql
 ```
 
 备份 SHA-256：

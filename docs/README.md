@@ -7,7 +7,7 @@
 - hierarchical taxonomy 会先确保父级 term 已同步，目标站子级 parent 使用目标站父级 term ID，不再直接使用源站 ID。
 - 源站删除 term 时只按关系表确认的目标 term 删除并清理关系，不按 slug 模糊删除；分站单独删除不会反向影响源站。
 - 文章同步分类关系时改为把源站 term ID 映射为目标站 term ID，避免多语言站 term ID 不一致时挂错分类或标签。
-- 新增回滚 smoke：`wp eval-file wp-content/plugins/wpmu-multilingual/tests/term-sync-smoke.php --allow-root --skip-themes`。
+- 新增回滚 smoke：`wp eval-file wpmu-multilingual/tests/term-sync-smoke.php --allow-root --skip-themes`。
 
 ## v0.9.8.7: PHP field-delta synchronization
 
@@ -590,7 +590,7 @@ OpenAI 由插件内部调用模型；Agent 通过 REST API 领取 payload 并提
 常用诊断命令：
 
 ```bash
-cd /www/wwwroot/likacloud.787k.com
+cd wpmu-multilingual/
 
 wp wpmu-ml doctor --allow-root --skip-themes
 ```
@@ -928,7 +928,7 @@ opencc
 进入站点目录：
 
 ```bash
-cd /www/wwwroot/likacloud.787k.com
+cd wpmu-multilingual/
 ```
 
 ### 12.1 单篇立即翻译
@@ -979,7 +979,7 @@ wp wpmu-ml job --job_id=62 --allow-root --skip-themes
 每 10 分钟处理 1 篇英文：
 
 ```cron
-*/10 * * * * cd /www/wwwroot/likacloud.787k.com && wp wpmu-ml translate --limit=1 --lang=en --allow-root --skip-themes >/dev/null 2>&1
+*/10 * * * * cd wpmu-multilingual/ && wp wpmu-ml translate --limit=1 --lang=en --allow-root --skip-themes >/dev/null 2>&1
 ```
 
 更稳的方式是每种语言分开设定不同频率。
@@ -1490,7 +1490,7 @@ id="legacy-banner"
 ### 22.1 确认 OpenAI 设置
 
 ```bash
-cd /www/wwwroot/likacloud.787k.com
+cd wpmu-multilingual/
 
 wp site option get wpmu_ml_settings --format=json --allow-root --skip-themes | php -r '
 $j=json_decode(stream_get_contents(STDIN),true);

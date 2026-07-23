@@ -1403,7 +1403,7 @@ opencc --version</pre>';
             echo '<p>插件后台“翻译引擎”里 OpenCC 命令路径可以留空自动检测，常见路径是 <code>/usr/bin/opencc</code>。繁体站一般使用 <code>s2twp.json</code> 或 <code>s2t.json</code>。</p>';
 
             echo '<h3>常用诊断命令</h3>';
-            echo '<pre class="wpmu-ml-pre">cd /www/wwwroot/likacloud.787k.com
+            echo '<pre class="wpmu-ml-pre">cd wpmu-multilingual
 wp wpmu-ml doctor --allow-root --skip-themes
 wp wpmu-ml doctor --job_id=62 --allow-root --skip-themes
 wp wpmu-ml job --job_id=62 --allow-root --skip-themes

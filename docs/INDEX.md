@@ -13,6 +13,7 @@
 ## 当前重点文档
 
 - Term 增删改同步需求：`plans/TERM_SYNC_REQUIREMENTS.md`
+- 0.9.8.8 taxonomy term 同步审核报告：`reports/WPMU多语言插件_0.9.8.8_taxonomy-term同步_OpenClaw审核测试报告_20260724.md`
 - 文章关联改进方案：`plans/WPMU多语言插件_文章关联改进方案.md`
 - 架构与翻译规则：`reference/ARCHITECTURE_AND_TRANSLATION_RULES.md`
 - 更新日志：`changelog/CHANGELOG.md`
