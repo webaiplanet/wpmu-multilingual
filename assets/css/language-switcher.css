@@ -1,0 +1,130 @@
+.wpmu-ml-language-switcher .wpmu-ml-language-name,
+.wpmu-ml-language-switcher .wpmu-ml-language-flag,
+.wpmu-ml-menu-language-item .wpmu-ml-language-flag {
+    vertical-align: middle;
+}
+
+.wpmu-ml-language-switcher .wpmu-ml-language-flag,
+.wpmu-ml-menu-language-item .wpmu-ml-language-flag {
+    display: inline-block;
+    margin: 0;
+    max-width: none;
+    object-fit: cover;
+}
+
+.wpmu-ml-language-content {
+    display: inline-flex;
+    align-items: center;
+    gap: .45em;
+    max-width: 100%;
+}
+
+.wpmu-ml-language-unavailable {
+    opacity: .72;
+}
+
+.wpmu-ml-language-unavailable > a,
+a[data-wpmu-ml-unavailable="1"] {
+    cursor: not-allowed;
+}
+
+.wpmu-ml-language-notice-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(15, 23, 42, .48);
+    backdrop-filter: blur(4px);
+}
+
+.wpmu-ml-language-notice-modal.is-active {
+    display: flex;
+}
+
+.wpmu-ml-language-notice-dialog {
+    position: relative;
+    width: min(440px, 100%);
+    border-radius: 18px;
+    background: #fff;
+    color: #1f2937;
+    box-shadow: 0 24px 70px rgba(15, 23, 42, .24);
+    padding: 34px 32px 28px;
+    text-align: center;
+    transform: translateY(8px) scale(.98);
+    animation: wpmuMlLanguageNoticeIn .18s ease-out forwards;
+}
+
+.wpmu-ml-language-notice-icon {
+    width: 54px;
+    height: 54px;
+    margin: 0 auto 18px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff3ed;
+    color: #ff4d36;
+    font-size: 28px;
+    line-height: 1;
+    font-weight: 700;
+}
+
+.wpmu-ml-language-notice-title {
+    margin: 0 0 10px;
+    color: #111827;
+    font-size: 22px;
+    line-height: 1.35;
+    font-weight: 700;
+}
+
+.wpmu-ml-language-notice-text {
+    margin: 0;
+    color: #4b5563;
+    font-size: 15px;
+    line-height: 1.75;
+}
+
+.wpmu-ml-language-notice-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.wpmu-ml-language-notice-close,
+.wpmu-ml-language-notice-ok {
+    border: 0;
+    border-radius: 999px;
+    padding: 10px 22px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.wpmu-ml-language-notice-ok {
+    background: #ff4d36;
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(255, 77, 54, .22);
+}
+
+.wpmu-ml-language-notice-close {
+    position: absolute;
+    top: 14px;
+    inset-inline-end: 14px;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    background: #f3f4f6;
+    color: #4b5563;
+    font-size: 20px;
+}
+
+@keyframes wpmuMlLanguageNoticeIn {
+    to {
+        transform: translateY(0) scale(1);
+    }
+}

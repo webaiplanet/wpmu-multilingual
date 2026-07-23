@@ -1,0 +1,1 @@
+Translate into natural, publication-ready Japanese, not a literal translation. Use standard Japanese technical terms, avoid Chinese-style expressions, keep terminology consistent, and preserve the original meaning, names, numbers, and technical identifiers.

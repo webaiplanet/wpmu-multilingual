@@ -1,0 +1,17 @@
+*.log
+*.sql
+*.sql.gz
+*.zip
+*.tar
+*.tar.gz
+*.bak
+*.bak-*
+*备份*
+*.tmp
+*~
+.DS_Store
+.env
+.env.*
+.cache/
+node_modules/
+vendor/
