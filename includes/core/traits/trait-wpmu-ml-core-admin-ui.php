@@ -509,9 +509,6 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
                 'oembed_cache',
                 'user_request',
                 'wp_global_styles',
-                'wp_template',
-                'wp_template_part',
-                'wp_navigation',
             ];
         }
 

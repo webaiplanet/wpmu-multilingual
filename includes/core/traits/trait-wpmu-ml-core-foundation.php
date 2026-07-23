@@ -524,6 +524,25 @@ if (!trait_exists('WPMU_ML_Core_Foundation_Trait')) {
                 );
             }
 
+            // 0.9.8.15 generic FSE relation scope. These WordPress core post-like
+            // objects carry visible theme/navigation text and real object IDs, so they
+            // should be eligible for cross-language relations instead of being tied to a
+            // specific site's current data. They were previously hard-hidden from the UI,
+            // so existing installs are migrated into the translatable list once.
+            if (version_compare($installed, '0.9.8.15', '<')) {
+                $stored = $this->get_stored_settings_array();
+                $translatable = array_values(array_unique(array_filter(array_map('sanitize_key', (array)($stored['translatable_post_types'] ?? [])))));
+                $shared = array_values(array_unique(array_filter(array_map('sanitize_key', (array)($stored['shared_post_types'] ?? [])))));
+                foreach (['wp_template', 'wp_template_part', 'wp_navigation'] as $post_type) {
+                    if (!in_array($post_type, $translatable, true) && !in_array($post_type, $shared, true)) {
+                        $translatable[] = $post_type;
+                    }
+                }
+                $stored['translatable_post_types'] = array_values(array_unique($translatable));
+                $stored['shared_post_types'] = $shared;
+                update_site_option(self::OPTION, $stored);
+            }
+
             $this->sync_sites_from_network(false);
             update_site_option('wpmu_ml_language_switcher_menu_sync_pending', self::VERSION);
             update_site_option('wpmu_ml_version', self::VERSION);
@@ -738,7 +757,7 @@ if (!trait_exists('WPMU_ML_Core_Foundation_Trait')) {
             'language_switcher_unpublished_policy' => 'hide',
             'enable_menu_language_switcher' => 0,
             'x_default_mode' => 'front',
-            'translatable_post_types' => ['post', 'page', 'guide_post', 'solution_post', 'activity_post', 'doing_post', 'reviews_post', 'knowledge_post', 'provider_post', 'docs_post', 'tools_post', 'wp_block'],
+            'translatable_post_types' => ['post', 'page', 'guide_post', 'solution_post', 'activity_post', 'doing_post', 'reviews_post', 'knowledge_post', 'provider_post', 'docs_post', 'tools_post', 'wp_block', 'wp_template', 'wp_template_part', 'wp_navigation'],
             'shared_post_types' => ['tolink'],
             'excluded_post_types' => [],
             'excluded_taxonomies' => ['nav_menu', 'link_category'],

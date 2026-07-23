@@ -1,3 +1,11 @@
+## 0.9.8.15 - 2026-07-24
+
+- 调整为插件通用关联策略，不再按某个网站现有对象判断应不应该关联。
+- 将 WordPress 站点编辑器对象 `wp_template`、`wp_template_part`、`wp_navigation` 纳入可翻译文章类型默认范围，使用现有 `wpmu_ml_post_relations` 建立跨语言关系。
+- 后台“参与翻译 / 共享发布”候选列表不再硬排除 `wp_template`、`wp_template_part`、`wp_navigation`。
+- 版本升级时会把这 3 个 FSE post-like 类型补进 `translatable_post_types`，因为旧版本后台无法选择它们。
+- 继续硬排除媒体 `attachment`、经典菜单项 `nav_menu_item`、ACF 配置类、全局样式 `wp_global_styles` 和用户相关对象，避免把资源文件、菜单结构配置、字段配置或用户数据当翻译内容处理。
+
 ## 0.9.8.14 - 2026-07-24
 
 - 将菜单调用相关的后台显示名称从 `Language Switcher` 改为 `WPMU 语言切换器`。
