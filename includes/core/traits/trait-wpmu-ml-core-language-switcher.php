@@ -69,12 +69,17 @@ if (!trait_exists('WPMU_ML_Core_Language_Switcher_Trait')) {
             return;
         }
         register_post_type(self::LANGUAGE_SWITCHER_POST_TYPE, [
-            'label' => 'Language Switcher',
+            'label' => 'WPMU 语言切换器',
             'labels' => [
-                'name' => 'Language Switcher',
-                'singular_name' => 'Language Switcher',
-                'menu_name' => 'Language Switcher',
-                'all_items' => 'Language Switcher',
+                'name' => 'WPMU 语言切换器',
+                'singular_name' => 'WPMU 语言切换器',
+                'menu_name' => 'WPMU 语言切换器',
+                'all_items' => 'WPMU 语言切换器',
+                'add_new_item' => '添加 WPMU 语言切换器项目',
+                'edit_item' => '编辑 WPMU 语言切换器项目',
+                'view_item' => '查看 WPMU 语言切换器项目',
+                'search_items' => '搜索 WPMU 语言切换器项目',
+                'not_found' => '没有 WPMU 语言切换器项目',
             ],
             'public' => false,
             'publicly_queryable' => false,

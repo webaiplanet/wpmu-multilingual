@@ -284,7 +284,7 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
             echo '</td></tr>';
             echo '<tr><th scope="row">当前状态</th><td>';
             echo $call_mode === 'menu' ? '<span class="wpmu-ml-ok">当前选择：菜单调用</span>' : '<span class="wpmu-ml-ok">当前选择：代码调用</span>';
-            echo '<p class="description">代码调用适合主题里直接写 <code>wpmu_ml_language_switcher()</code>；菜单调用适合 WordPress 外观菜单里拖拽 Language Switcher 菜单项。</p>';
+            echo '<p class="description">代码调用适合主题里直接写 <code>wpmu_ml_language_switcher()</code>；菜单调用适合 WordPress 外观菜单里拖拽 WPMU 语言切换器菜单项。</p>';
             echo '</td></tr>';
             echo '</tbody></table>';
             echo '</div>';
@@ -295,7 +295,7 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
             echo '<code>wpmu_ml_language_switcher()</code>';
             echo '<p class="description">主题模板中可直接调用。插件负责当前语言、可切换语言、URL、hreflang/lang；主题负责 CSS、下拉效果和响应式。</p>';
             $code_example = "<?php\nif (function_exists('wpmu_ml_language_switcher')) {\n    wpmu_ml_language_switcher([\n        'display'     => 'full',\n        'class'       => 'language-menu',\n        'flag_mode'   => 'before',\n        'flag_style'  => '4x3',\n        'flag_size'   => 24,\n        'flag_radius' => 2,\n    ]);\n}\n?>";
-            echo '<pre class="wpmu-ml-pre wpmu-ml-code-example"><code>' . esc_html($code_example) . '</code></pre>';
+            echo '<pre class="wpmu-ml-pre wpmu-ml-code-example"><code style=" background: unset; ">' . esc_html($code_example) . '</code></pre>';
             echo '</td></tr>';
             echo '<tr><th scope="row">显示设置</th><td><p class="description">代码调用会使用本页“基础设置”中的语言显示、旗帜和未发布语言处理规则；主题可通过参数覆盖部分显示项。</p></td></tr>';
             echo '</tbody></table>';
@@ -305,14 +305,14 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
             echo '<table class="form-table"><tbody>';
             echo '<tr><th scope="row">显示在后台菜单</th><td>';
             echo '<input type="hidden" name="enable_menu_language_switcher" value="0">';
-            echo '<label><input type="checkbox" name="enable_menu_language_switcher" value="1" ' . checked($enabled, true, false) . '> 在各语言站点的“外观 → 菜单”中显示 <strong>Language Switcher</strong> 菜单项面板</label>';
+            echo '<label><input type="checkbox" name="enable_menu_language_switcher" value="1" ' . checked($enabled, true, false) . '> 在各语言站点的“外观 → 菜单”中显示 <strong>WPMU 语言切换器</strong> 菜单项面板</label>';
             echo '<p class="description">启用后，面板会自动提供“当前语言”和全部已启用语言。进入各分站的“外观 → 菜单”，勾选项目并添加到菜单，再把具体语言拖到“当前语言”下面即可形成二级下拉菜单。</p>';
             echo '</td></tr>';
             echo '<tr><th scope="row">当前状态</th><td>';
             if ($enabled) {
                 echo '<span class="wpmu-ml-ok">已启用</span><p class="description">语言菜单项会根据“语言站点”中的启用状态、排序和语言名称自动同步。前台菜单会把“当前语言”替换为当前站点语言，并隐藏下拉列表中重复的当前语言。</p>';
             } else {
-                echo '<span class="wpmu-ml-muted">未启用</span><p class="description">关闭时不会在“外观 → 菜单”中注册 Language Switcher 面板。已创建的虚拟语言项目会保留，重新启用后可继续使用。</p>';
+                echo '<span class="wpmu-ml-muted">未启用</span><p class="description">关闭时不会在“外观 → 菜单”中注册 WPMU 语言切换器面板。已创建的虚拟语言项目会保留，重新启用后可继续使用。</p>';
             }
             echo '</td></tr>';
             echo '<tr><th scope="row">旗帜设置</th><td><p class="description">菜单调用会使用“基础设置”中的旗帜位置、比例、尺寸和圆角。</p></td></tr>';
@@ -592,8 +592,8 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
         {
             global $wpdb;
             echo '<h2>关联统计</h2>';
-            $invalid_statuses = ['target_missing','target_identity_conflict','target_slug_conflict','relation_invalid','target_deleted','target_trashed'];
-            $invalid_in = implode(',', array_map(function($status) {
+            $invalid_statuses = ['target_missing', 'target_identity_conflict', 'target_slug_conflict', 'relation_invalid', 'target_deleted', 'target_trashed'];
+            $invalid_in = implode(',', array_map(function ($status) {
                 return "'" . esc_sql($status) . "'";
             }, $invalid_statuses));
             $invalid_counts = $wpdb->get_results(

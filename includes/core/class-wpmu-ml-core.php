@@ -8,7 +8,7 @@ require_once __DIR__ . '/traits/bootstrap.php';
 if (!class_exists('WPMU_Multilingual')) {
 
     final class WPMU_Multilingual {
-        const VERSION = '0.9.8.13';
+        const VERSION = '0.9.8.14';
         const OPTION = 'wpmu_ml_settings';
         const NONCE_ACTION = 'wpmu_ml_admin_action';
         const NONCE_NAME = 'wpmu_ml_nonce';

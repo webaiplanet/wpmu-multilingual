@@ -90,6 +90,12 @@
 - 任务表迁移仅新增 `change_manifest`、`translated_content`，不重建关系、不修改文章 ID 或历史 URL。
 - 两组事务回滚测试通过：未翻译目标只同步变化 Meta 并进入 `pending`；已翻译目标保留旧译文并进入 `translated_update_pending`；Agent Payload 均只包含变化字段，测试残留为 0。
 
+### 2026-07-24 / 0.9.8.14 WPMU 语言切换器显示名称
+
+- 菜单调用相关显示名称从 `Language Switcher` 改为 `WPMU 语言切换器`。
+- 外观菜单里的菜单项面板和插件设置页文案同步改名，避免与其他插件的同名面板混淆。
+- 内部 post type 标识保持 `wpmu_ml_switcher` 不变，兼容已有数据。
+
 ### 2026-07-24 / 0.9.8.13 语言切换代码示例样式修复
 
 - “语言切换 → 代码调用”示例改为真正多行输出。

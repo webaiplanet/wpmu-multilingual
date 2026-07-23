@@ -86,7 +86,7 @@ wp wpmu-ml translate --limit=1 --lang=en --allow-root --skip-themes
 
 ## 当前版本
 
-当前开发版本：`0.9.8.13`
+当前开发版本：`0.9.8.14`
 
 该插件仍处于持续开发阶段。建议先在测试环境验证语言站点、文章关系、自动同步和翻译队列，再用于生产环境。
 
@@ -185,7 +185,7 @@ wp wpmu-ml translate --limit=1 --lang=en --allow-root --skip-themes
 
 ## Current Version
 
-Current development version: `0.9.8.13`
+Current development version: `0.9.8.14`
 
 The plugin is still under active development. Test language sites, post relations, synchronization, and translation queues in a staging environment before production use.
 
