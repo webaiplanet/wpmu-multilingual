@@ -361,6 +361,7 @@ final class WPMU_ML_Agent {
         $job_status = $complete_status === 'publish' ? 'agent_done_published' : 'agent_translated';
         $message = 'Agent 翻译完成，目标文章状态：' . $complete_status;
         $message .= '；字段写回 ' . intval($apply['meta_translated'] ?? 0) . ' 项，跳过 ' . intval($apply['meta_skipped'] ?? 0) . ' 项';
+        $message .= '；Gutenberg 区块数据写回 ' . intval($apply['gutenberg_translated'] ?? 0) . ' 项';
         $wpdb->update($this->core->get_table_name('jobs'), [
             'status' => $job_status,
             'last_error' => $message,
@@ -375,6 +376,7 @@ final class WPMU_ML_Agent {
             'job_id' => $job_id,
             'status' => $job_status,
             'meta_translated' => intval($apply['meta_translated'] ?? 0),
+            'gutenberg_translated' => intval($apply['gutenberg_translated'] ?? 0),
         ]);
         return rest_ensure_response([
             'ok' => true,
@@ -383,6 +385,7 @@ final class WPMU_ML_Agent {
             'target_post_id' => (int)$job['target_post_id'],
             'target_post_status' => $complete_status,
             'meta_translated' => intval($apply['meta_translated'] ?? 0),
+            'gutenberg_translated' => intval($apply['gutenberg_translated'] ?? 0),
         ]);
     }
 

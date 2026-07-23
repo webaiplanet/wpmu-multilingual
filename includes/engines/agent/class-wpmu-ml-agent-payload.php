@@ -54,7 +54,7 @@ final class WPMU_ML_Agent_Payload {
             (int)($job['target_blog_id'] ?? 0),
             $settings
         );
-        $fields = $this->build_post_fields($source_post);
+        $fields = $this->build_post_fields($source_post, $settings);
         $meta_fields = $this->build_meta_fields($source_meta, $settings);
         $fields = array_merge($fields, $meta_fields);
 
@@ -72,6 +72,9 @@ final class WPMU_ML_Agent_Payload {
             $fields = array_values(array_filter($fields, function($field) use ($job, $allowed_meta_keys) {
                 if ((string)($field['field_scope'] ?? '') === 'post') {
                     return $this->core->translation_job_selects_core_field($job, (string)($field['field_id'] ?? ''));
+                }
+                if ((string)($field['field_scope'] ?? '') === 'gutenberg') {
+                    return $this->core->translation_job_selects_core_field($job, 'post_content');
                 }
                 return !is_array($allowed_meta_keys) || in_array((string)($field['meta_key'] ?? ''), $allowed_meta_keys, true);
             }));
@@ -131,6 +134,8 @@ final class WPMU_ML_Agent_Payload {
                 'follow_translation_rules' => true,
                 'preserve_slug' => true,
                 'preserve_urls' => true,
+                'preserve_wp_blocks' => true,
+                'translate_gutenberg_comment_data_via_separate_fields' => true,
                 'preserve_shortcodes' => true,
                 'preserve_html_tags' => true,
                 'preserve_code_structure' => true,
@@ -225,9 +230,9 @@ final class WPMU_ML_Agent_Payload {
         return array_values(array_unique($patterns));
     }
 
-    private function build_post_fields($source_post) {
+    private function build_post_fields($source_post, $settings) {
         $post_content = $this->sanitize_translation_source((string)$source_post->post_content);
-        return [
+        $fields = [
             [
                 'field_id' => 'post_title',
                 'field_scope' => 'post',
@@ -258,6 +263,83 @@ final class WPMU_ML_Agent_Payload {
                 'preserve_shortcodes' => true,
                 'preserve_html_tags' => true,
             ],
+        ];
+        return array_merge($fields, $this->build_gutenberg_comment_fields($post_content, $settings));
+    }
+
+    private function build_gutenberg_comment_fields($content, $settings) {
+        $content = (string)$content;
+        if ($content === '' || strpos($content, '<!--') === false || !$this->contains_cjk_text($content)) {
+            return [];
+        }
+        preg_match_all('~<!--(.*?)-->~s', $content, $matches, PREG_SET_ORDER);
+        if (!$matches) {
+            return [];
+        }
+        $fields = [];
+        foreach ($matches as $comment_index => $match) {
+            $source_comment = (string)($match[0] ?? '');
+            $inner = substr($source_comment, 4, -3);
+            if (!preg_match('/^\s*wp:/', $inner) || preg_match('/^\s*wp:(?:code|preformatted)\b/i', $inner)) {
+                continue;
+            }
+            $json_start = strpos($inner, '{');
+            $json_end = strrpos($inner, '}');
+            if ($json_start === false || $json_end === false || $json_end <= $json_start) {
+                continue;
+            }
+            $decoded = json_decode(substr($inner, $json_start, $json_end - $json_start + 1), true);
+            if (!is_array($decoded)) {
+                continue;
+            }
+            $this->append_gutenberg_comment_value_fields($fields, $decoded, (int)$comment_index, hash('sha256', $source_comment), [], $settings);
+        }
+        return $fields;
+    }
+
+    private function append_gutenberg_comment_value_fields(&$fields, $value, $comment_index, $comment_hash, $path, $settings) {
+        if (is_array($value)) {
+            foreach ($value as $key => $child) {
+                if (is_string($key) && $this->should_skip_data_key($key, $settings)) {
+                    continue;
+                }
+                $next_path = $path;
+                $next_path[] = $key;
+                $this->append_gutenberg_comment_value_fields($fields, $child, $comment_index, $comment_hash, $next_path, $settings);
+            }
+            return;
+        }
+        if (is_object($value)) {
+            foreach ($value as $key => $child) {
+                if (is_string($key) && $this->should_skip_data_key($key, $settings)) {
+                    continue;
+                }
+                $next_path = $path;
+                $next_path[] = $key;
+                $this->append_gutenberg_comment_value_fields($fields, $child, $comment_index, $comment_hash, $next_path, $settings);
+            }
+            return;
+        }
+        if (!is_string($value)) {
+            return;
+        }
+        $value = $this->sanitize_translation_source((string)$value);
+        if (!$this->should_translate_meta_string($value)) {
+            return;
+        }
+        $path_json = wp_json_encode($path, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $last_key = $path ? (string)end($path) : 'gutenberg';
+        $fields[] = [
+            'field_id' => 'gutenberg:' . (int)$comment_index . ':' . substr(sha1($comment_hash . '|' . $path_json), 0, 20),
+            'field_scope' => 'gutenberg',
+            'field_type' => $this->classify_field_type($last_key, $path),
+            'format' => $this->detect_format($value, $last_key, $path),
+            'source' => $value,
+            'translatable' => true,
+            'required' => false,
+            'comment_index' => (int)$comment_index,
+            'comment_hash' => (string)$comment_hash,
+            'value_path' => array_values($path),
         ];
     }
 

@@ -36,6 +36,13 @@ final class WPMU_ML_Agent_Result_Applier {
             'ID' => (int)$job['target_post_id'],
             'post_status' => $complete_status,
         ];
+        if (array_key_exists('post_content', $targets)) {
+            $gutenberg_applied = $this->apply_gutenberg_comment_fields((string)$targets['post_content'], $targets, $payload);
+            if (is_wp_error($gutenberg_applied)) {
+                return $gutenberg_applied;
+            }
+            $targets['post_content'] = (string)$gutenberg_applied;
+        }
         foreach (['post_title','post_excerpt','post_content'] as $field) {
             if (array_key_exists($field, $targets)) {
                 $postarr[$field] = wp_slash((string)$targets[$field]);
@@ -112,7 +119,102 @@ final class WPMU_ML_Agent_Result_Applier {
             'post_status' => $complete_status,
             'meta_translated' => (int)($meta_result['translated'] ?? 0),
             'meta_skipped' => (int)($meta_result['skipped'] ?? 0),
+            'gutenberg_translated' => (int)$this->count_returned_gutenberg_fields($targets, $payload),
         ];
+    }
+
+    private function count_returned_gutenberg_fields($targets, $payload) {
+        $count = 0;
+        foreach ((array)($payload['fields'] ?? []) as $field) {
+            if (!is_array($field) || (string)($field['field_scope'] ?? '') !== 'gutenberg') {
+                continue;
+            }
+            $field_id = (string)($field['field_id'] ?? '');
+            if ($field_id !== '' && array_key_exists($field_id, (array)$targets)) {
+                $count++;
+            }
+        }
+        return $count;
+    }
+
+    private function apply_gutenberg_comment_fields($content, $targets, $payload) {
+        $content = (string)$content;
+        $fields_by_comment = [];
+        foreach ((array)($payload['fields'] ?? []) as $field) {
+            if (!is_array($field) || (string)($field['field_scope'] ?? '') !== 'gutenberg') {
+                continue;
+            }
+            $field_id = (string)($field['field_id'] ?? '');
+            if ($field_id === '' || !array_key_exists($field_id, (array)$targets)) {
+                continue;
+            }
+            $comment_index = isset($field['comment_index']) ? (int)$field['comment_index'] : -1;
+            if ($comment_index < 0) {
+                continue;
+            }
+            $fields_by_comment[$comment_index][] = $field;
+        }
+        if (!$fields_by_comment) {
+            return $content;
+        }
+
+        preg_match_all('~<!--(.*?)-->~s', $content, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
+        if (!$matches) {
+            return new WP_Error('wpmu_ml_agent_gutenberg_comments_missing', 'Agent 返回正文中缺少 Gutenberg 注释，无法写回区块数据字段。');
+        }
+
+        $replacements = [];
+        foreach ($fields_by_comment as $comment_index => $fields) {
+            if (empty($matches[$comment_index][0][0])) {
+                return new WP_Error('wpmu_ml_agent_gutenberg_comment_missing', 'Agent 返回正文中缺少指定 Gutenberg 注释：' . (int)$comment_index . '。');
+            }
+            $source_comment = (string)$matches[$comment_index][0][0];
+            $expected_hash = (string)($fields[0]['comment_hash'] ?? '');
+            if ($expected_hash !== '' && !hash_equals($expected_hash, hash('sha256', $source_comment))) {
+                return new WP_Error('wpmu_ml_agent_gutenberg_comment_changed', 'Agent 返回正文中的 Gutenberg 注释已变化，拒绝写回区块数据字段。');
+            }
+            $inner = substr($source_comment, 4, -3);
+            $json_start = strpos($inner, '{');
+            $json_end = strrpos($inner, '}');
+            if ($json_start === false || $json_end === false || $json_end <= $json_start) {
+                continue;
+            }
+            $decoded = json_decode(substr($inner, $json_start, $json_end - $json_start + 1), true);
+            if (!is_array($decoded)) {
+                continue;
+            }
+            $changed = false;
+            foreach ($fields as $field) {
+                $field_id = (string)($field['field_id'] ?? '');
+                $path = isset($field['value_path']) && is_array($field['value_path']) ? $field['value_path'] : [];
+                if ($field_id === '' || !$path) {
+                    continue;
+                }
+                if ($this->set_path_value($decoded, $path, (string)$targets[$field_id])) {
+                    $changed = true;
+                }
+            }
+            if (!$changed) {
+                continue;
+            }
+            $new_json = wp_json_encode($decoded, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            if (!is_string($new_json) || $new_json === '') {
+                return new WP_Error('wpmu_ml_agent_gutenberg_json_encode_failed', 'Gutenberg 区块数据重新编码失败。');
+            }
+            $replacements[] = [
+                'offset' => (int)$matches[$comment_index][0][1],
+                'length' => strlen($source_comment),
+                'value' => '<!--' . substr($inner, 0, $json_start) . $new_json . substr($inner, $json_end + 1) . '-->',
+            ];
+        }
+
+        usort($replacements, static function($a, $b) {
+            return ((int)$b['offset']) <=> ((int)$a['offset']);
+        });
+        foreach ($replacements as $replacement) {
+            $content = substr_replace($content, (string)$replacement['value'], (int)$replacement['offset'], (int)$replacement['length']);
+        }
+        return $content;
     }
 
     private function apply_meta_fields($job, $targets, $payload) {

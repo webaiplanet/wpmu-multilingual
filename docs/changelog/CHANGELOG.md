@@ -1,3 +1,9 @@
+## 0.9.8.17 - 2026-07-24
+
+- Agent API payload 新增 `field_scope=gutenberg` 字段，单独暴露 Gutenberg / ACF block 注释 JSON 中的人类可读文本。
+- Agent API result 写回时只更新 Gutenberg 注释 JSON 的 value，不改 block 名、字段 key、ACF field key、URL 或结构。
+- 解决 ACF 区块表格、按钮组、链接列表等文字藏在 `<!-- wp:acf/... -->` 注释里时，外部 Agent 只能翻译正文、不能稳定写回区块数据的问题。
+
 ## 0.9.8.16 - 2026-07-24
 
 - 修复 Agent API result 写回长正文时，WordPress 将正文中的 `&` 规范化为 `&amp;`、将 `<img .../>` 规范化为 `<img ... />` 后导致回读完整性校验误报 `post_content` 不一致的问题。
