@@ -143,16 +143,16 @@ if (!trait_exists('WPMU_ML_Core_Admin_Actions_Trait')) {
         $settings['hide_unpublished'] = 1;
         $settings['x_default_mode'] = in_array(($_POST['x_default_mode'] ?? 'front'), ['front','source','none'], true) ? $_POST['x_default_mode'] : 'front';
 
-        // v0.4.0 起优先使用勾选式表单；兼容旧版 textarea 字段。
+        // Prefer checkbox-based forms; keep textarea compatibility for older saved requests.
         if (isset($_POST['translatable_post_types_checked']) || isset($_POST['translatable_post_types_manual'])) {
             $shared_post_types = $this->merge_checked_and_manual('shared_post_types_checked', 'shared_post_types_manual');
             $translatable_post_types = $this->merge_checked_and_manual('translatable_post_types_checked', 'translatable_post_types_manual');
-            // v0.4.3 起“参与翻译”和“共享发布”互斥；重复时共享发布优先。
+            // "Translatable" and "shared publishing" are mutually exclusive; shared publishing wins.
             $settings['shared_post_types'] = $shared_post_types;
             $settings['translatable_post_types'] = array_values(array_diff($translatable_post_types, $shared_post_types));
-            // v0.4.1 起文章类型只采用白名单逻辑：未勾选即不参与，不再需要“排除的文章类型”。
+            // Post types use whitelist semantics: unchecked types do not participate.
             $settings['excluded_post_types'] = [];
-            // v0.4.2 起分类法也采用白名单逻辑：只同步勾选的分类法。
+            // Taxonomies also use whitelist semantics.
             $settings['sync_taxonomies'] = $this->merge_checked_and_manual('sync_taxonomies_checked', 'sync_taxonomies_manual');
             $settings['excluded_taxonomies'] = [];
         } else {
@@ -189,7 +189,7 @@ if (!trait_exists('WPMU_ML_Core_Admin_Actions_Trait')) {
         foreach (['auto_sync_enabled','auto_sync_on_update','restore_sync_enabled','protect_translated','queue_on_sync','sync_title','sync_content','sync_excerpt','sync_meta','sync_terms'] as $key) {
             $settings[$key] = !empty($_POST[$key]) ? 1 : 0;
         }
-        // slug 是 URL 稳定性字段，开发测试期也不允许关闭或翻译。
+        // Slug is a URL stability field and is always synchronized from the source.
         $settings['sync_slug'] = 1;
         $trash_policy = sanitize_key($_POST['trash_sync_policy'] ?? 'drafts_only');
         $settings['trash_sync_policy'] = in_array($trash_policy, ['none','drafts_only','all'], true) ? $trash_policy : 'drafts_only';
@@ -197,7 +197,7 @@ if (!trait_exists('WPMU_ML_Core_Admin_Actions_Trait')) {
         $settings['delete_sync_policy'] = in_array($delete_policy, ['none','drafts_only','all'], true) ? $delete_policy : 'drafts_only';
         $status = sanitize_key($_POST['target_default_status'] ?? 'draft');
         $settings['target_default_status'] = in_array($status, ['draft','pending'], true) ? $status : 'draft';
-        // v0.5.6 起取消“按语言指定同步状态”，避免与翻译完成后状态混淆。
+        // Sync status is global here; translation completion status is configured in engine routing.
         unset($settings['sync_status_by_lang']);
         $this->persist_network_settings($settings);
         wp_safe_redirect(network_admin_url('admin.php?page=wpmu-multilingual&tab=sync&updated=1'));
@@ -626,8 +626,7 @@ if (!trait_exists('WPMU_ML_Core_Admin_Actions_Trait')) {
 
     public function handle_sync_same_id_drafts() {
         $this->verify_network_action();
-        $this->log('info', 'sync_same_id_drafts', '当前版本暂未实现复杂同步，仅用于占位。');
-        wp_safe_redirect(network_admin_url('admin.php?page=wpmu-multilingual&tab=tools&updated=1'));
+        wp_die('同 ID 猜测补建工具已停用。请使用只读审计和严格来源 meta 恢复预览。', '工具已停用', ['response' => 409]);
         exit;
     }
 

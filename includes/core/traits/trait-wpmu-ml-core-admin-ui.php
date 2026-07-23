@@ -296,7 +296,7 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
             echo '<p class="description">主题模板中可直接调用。插件负责当前语言、可切换语言、URL、hreflang/lang；主题负责 CSS、下拉效果和响应式。</p>';
             echo '<pre class="wpmu-ml-pre">&lt;?php\nif (function_exists(\'wpmu_ml_language_switcher\')) {\n    wpmu_ml_language_switcher([\n        \'display\' =&gt; \'full\',\n        \'class\'   =&gt; \'language-menu\',\n        \'flag_mode\' =&gt; \'before\',\n        \'flag_style\' =&gt; \'4x3\',\n        \'flag_size\' =&gt; 24,\n        \'flag_radius\' =&gt; 2,\n    ]);\n}\n?&gt;</pre>';
             echo '</td></tr>';
-            echo '<tr><th scope="row">显示设置</th><td><p class="description">后续代码调用专用的显示项会放这里，例如显示名称/简称、是否显示当前语言、未发布语言处理、结构类型、旗帜位置等。</p></td></tr>';
+            echo '<tr><th scope="row">显示设置</th><td><p class="description">代码调用会使用本页“基础设置”中的语言显示、旗帜和未发布语言处理规则；主题可通过参数覆盖部分显示项。</p></td></tr>';
             echo '</tbody></table>';
             echo '</div>';
 
@@ -314,7 +314,7 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
                 echo '<span class="wpmu-ml-muted">未启用</span><p class="description">关闭时不会在“外观 → 菜单”中注册 Language Switcher 面板。已创建的虚拟语言项目会保留，重新启用后可继续使用。</p>';
             }
             echo '</td></tr>';
-            echo '<tr><th scope="row">旗帜设置</th><td><p class="description">菜单调用下也可以按这里的全局默认显示旗帜，后续可继续拆成桌面/移动端、圆角、方形等更细的选项。</p></td></tr>';
+            echo '<tr><th scope="row">旗帜设置</th><td><p class="description">菜单调用会使用“基础设置”中的旗帜位置、比例、尺寸和圆角。</p></td></tr>';
             echo '</tbody></table>';
             echo '</div>';
 
@@ -617,7 +617,7 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
                 echo '<p>还没有关联数据。</p>';
             }
             echo '<hr>';
-            echo '<div class="notice notice-warning inline"><p><strong>生产关系重建已禁用。</strong>0.9.8 不再清空关系表后按相同 ID 或 slug 猜测关联。</p><p>全站只读汇总：<code>wp wpmu-ml audit-relations --summary --allow-root --skip-themes</code></p><p>逐条分页审计：<code>wp wpmu-ml audit-relations --target_blog_id=1 --limit=500 --offset=0 --allow-root --skip-themes</code></p><p>严格来源 meta 恢复预览：<code>wp wpmu-ml reconcile-relations --target_blog_id=1 --limit=500 --allow-root --skip-themes</code></p></div>';
+            echo '<div class="notice notice-warning inline"><p><strong>生产关系重建已禁用。</strong>插件不会清空关系表，也不会按相同 ID 或 slug 猜测文章关系。</p><p>全站只读汇总：<code>wp wpmu-ml audit-relations --summary --allow-root --skip-themes</code></p><p>逐条分页审计：<code>wp wpmu-ml audit-relations --target_blog_id=目标站ID --limit=500 --offset=0 --allow-root --skip-themes</code></p><p>严格来源 meta 恢复预览：<code>wp wpmu-ml reconcile-relations --target_blog_id=目标站ID --limit=500 --allow-root --skip-themes</code></p></div>';
         }
 
         private function render_sync_page()
@@ -897,10 +897,10 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
             echo '<style>';
             echo '.wpmu-ml-select{min-width:180px}.wpmu-ml-engine-table td{vertical-align:middle}.wpmu-ml-engine-note{max-width:980px}.wpmu-ml-mini-code{background:#f6f7f7;border:1px solid #dcdcde;padding:2px 5px;border-radius:3px}';
             echo '.wpmu-ml-engine-panel{display:none;background:#fff;border:1px solid #ccd0d4;padding:18px 20px 8px;max-width:1240px;margin-top:0}.wpmu-ml-engine-panel.is-active{display:block}.wpmu-ml-engine-panel h2{margin-top:0}.wpmu-ml-route-priority{margin:0;margin-block-start:8px;margin-inline-start:18px}.wpmu-ml-route-priority li{margin-bottom:4px}.wpmu-ml-preview-table select[disabled],.wpmu-ml-preview-table input[disabled]{opacity:.65}.wpmu-ml-subtab-save{margin-top:18px}.wpmu-ml-route-help{margin:10px 0 18px;max-width:1100px}.wpmu-ml-combo-notice{max-width:1120px}.wpmu-ml-combo-rules,.wpmu-ml-route-language-rules{border:1px solid #c3c4c7;background:#fff;padding:12px 14px;margin:10px 0 14px}.wpmu-ml-combo-rules summary,.wpmu-ml-route-language-rules summary{cursor:pointer;font-size:14px}';
-            echo '.wpmu-ml-engine-inner-tabs{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 18px;padding:6px;background:#f0f0f1;border-radius:6px}.wpmu-ml-engine-inner-tab{border:1px solid transparent;background:transparent;padding:8px 13px;border-radius:4px;cursor:pointer;font-weight:600;color:#3c434a}.wpmu-ml-engine-inner-tab.is-active{background:#fff;border-color:#c3c4c7;color:#2271b1;box-shadow:0 1px 2px rgba(0,0,0,.05)}.wpmu-ml-engine-inner-panel{display:none}.wpmu-ml-engine-inner-panel.is-active{display:block}.wpmu-ml-language-profile{border:1px solid #c3c4c7;border-radius:6px;background:#fff;margin:0 0 12px}.wpmu-ml-language-profile summary{cursor:pointer;padding:13px 15px;font-weight:600;background:#f6f7f7}.wpmu-ml-language-profile__body{padding:6px 16px 16px}.wpmu-ml-language-profile .form-table th{width:190px}.wpmu-ml-language-profile textarea{max-width:900px}.wpmu-ml-language-meta{font-weight:400;color:#646970;margin-inline-start:8px}.wpmu-ml-engine-panel{max-width:none}.wpmu-ml-engine-primary-note{max-width:1180px}';
+            echo '.wpmu-ml-engine-inner-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0;border-bottom:1px solid #ccd0d4}.wpmu-ml-engine-inner-tab{border:1px solid #ccd0d4;border-bottom:none;background:#f6f7f7;color:#1d2327;padding:9px 18px;border-radius:4px 4px 0 0;text-decoration:none;font-weight:600;font-size:14px;cursor:pointer}.wpmu-ml-engine-inner-tab:hover{color:#2271b1;background:#fff}.wpmu-ml-engine-inner-tab.is-active{background:#fff;color:#2271b1;border-bottom:1px solid #fff;margin-bottom:-1px}.wpmu-ml-engine-inner-panel{display:none;background:#fff;border:1px solid #ccd0d4;border-top:none;padding:18px 20px 8px}.wpmu-ml-engine-inner-panel.is-active{display:block}@media (max-width:782px){.wpmu-ml-engine-inner-tabs{align-items:stretch}.wpmu-ml-engine-inner-tab{width:100%;border-bottom:1px solid #ccd0d4;border-radius:4px}}.wpmu-ml-language-profile{border:1px solid #c3c4c7;border-radius:6px;background:#fff;margin:0 0 12px}.wpmu-ml-language-profile summary{cursor:pointer;padding:13px 15px;font-weight:600;background:#f6f7f7}.wpmu-ml-language-profile__body{padding:6px 16px 16px}.wpmu-ml-language-profile .form-table th{width:190px}.wpmu-ml-language-profile textarea{max-width:900px}.wpmu-ml-language-meta{font-weight:400;color:#646970;margin-inline-start:8px}.wpmu-ml-engine-panel{max-width:none}.wpmu-ml-engine-primary-note{max-width:1180px}';
             echo '</style>';
 
-            echo '<p class="wpmu-ml-engine-note wpmu-ml-engine-primary-note">这里已经从“翻译设置”中独立出来。上方使用与“翻译设置”一致的一级选项卡；每个引擎内部仍可继续增加自己的二级选项卡和语言级配置。</p>';
+            echo '<p class="wpmu-ml-engine-note wpmu-ml-engine-primary-note">在这里配置翻译任务使用的引擎、路由规则、完成状态和各引擎参数。</p>';
             echo '<div class="notice notice-info inline"><p>当前内置主翻译入口为：人工翻译、OpenAI 兼容、Agent API。OpenCC 不作为默认翻译引擎显示；只有源站识别为简体中文、目标语言为繁体中文时，才在目标语言规则中显示为高性能简繁转换方式。Agent API 不在 WordPress 内部调用模型，但会通过 <code>/agent/rules</code> 和任务 payload 向外部 Agent 提供本插件统一维护的翻译规则与术语库。</p></div>';
 
             echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" id="wpmu-ml-engine-settings-form">';
@@ -911,7 +911,7 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
 
             echo '<div class="wpmu-ml-engine-panel' . ($active_tab === 'routing' ? ' is-active' : '') . '" data-panel="routing">';
             echo '<h2>默认与路由</h2>';
-            echo '<p class="description">这里负责决定某个翻译任务进入队列时使用哪个引擎、完成后是什么文章状态。引擎自身的 Key、模型参数、OpenCC 路径等放到对应子选项卡。</p>';
+            echo '<p class="description">用于决定翻译任务进入队列时使用哪个引擎，以及处理完成后目标文章应保存为什么状态。引擎 Key、模型参数和 OpenCC 路径在各引擎页中配置。</p>';
             echo '<table class="form-table"><tbody>';
             echo '<tr><th>默认翻译引擎</th><td><select class="wpmu-ml-select" name="translation_default_engine">';
             foreach ($default_engines as $key => $label) {
@@ -966,7 +966,7 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
             echo '</details>';
 
             echo '<h3>按文章类型设置翻译方式 / 模型</h3>';
-            echo '<p class="description">这里从 v0.8.7 开始参与实际路由。适合让不同 CPT 使用不同引擎或 OpenAI 兼容模型，例如 knowledge_post 用 gpt-5.5，普通 post 用 gpt-5.4，某些 CPT 走 Agent。</p>';
+            echo '<p class="description">可按文章类型指定默认翻译方式和 OpenAI 兼容模型。目标语言规则优先于文章类型规则；需要更细时使用下方“精确覆盖规则”。</p>';
             $post_types = array_values(array_unique(array_filter((array)$settings['translatable_post_types'])));
             if (!$post_types) {
                 $post_types = $this->get_detected_post_types();
@@ -989,7 +989,7 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
                         echo '<option value="' . esc_attr($key) . '" ' . selected($pt_engine, $key, false) . '>' . esc_html($label) . '</option>';
                     }
                     echo '</select></td>';
-                    echo '<td><input type="text" class="regular-text" name="translation_models_by_post_type[' . esc_attr($pt) . ']" value="' . esc_attr($pt_model) . '" placeholder="仅 OpenAI 兼容有效，例如 gpt-5.5"></td>';
+                    echo '<td><input type="text" class="regular-text" name="translation_models_by_post_type[' . esc_attr($pt) . ']" value="' . esc_attr($pt_model) . '" placeholder="仅 OpenAI 兼容有效，例如 gpt-4o-mini"></td>';
                     echo '<td><select class="wpmu-ml-select" name="translation_status_by_post_type[' . esc_attr($pt) . ']">';
                     echo '<option value="" ' . selected($pt_status, '', false) . '>继承默认/目标语言</option>';
                     foreach ($status_labels as $value => $label) {
@@ -1004,9 +1004,9 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
                 echo '<p>当前没有检测到文章类型。</p>';
             }
 
-            echo '<div class="notice notice-info inline wpmu-ml-combo-notice"><p><strong>精确覆盖规则：目标语言 + 文章类型</strong>（优先级最高）。用于指定某个语言下某类文章的引擎和模型，例如 <code>ko + knowledge_post = Agent API</code>，或 <code>en + knowledge_post = OpenAI 兼容 + gpt-5.5</code>。</p></div>';
+            echo '<div class="notice notice-info inline wpmu-ml-combo-notice"><p><strong>精确覆盖规则：目标语言 + 文章类型</strong>（优先级最高）。用于指定某个目标语言下某类内容的引擎、模型和完成状态。</p></div>';
             echo '<details class="wpmu-ml-combo-rules" style="margin-top:10px"><summary><strong>展开/收起精确覆盖规则</strong></summary>';
-            echo '<p class="description">组合规则优先级最高。适合设置：ko + knowledge_post 走 Agent；en + knowledge_post 走 OpenAI 兼容 + gpt-5.5。</p>';
+            echo '<p class="description">组合规则优先级最高，适合为特定语言和特定文章类型设置不同处理方式。</p>';
             $combo_engines = is_array($settings['translation_engines_by_lang_post_type'] ?? null) ? $settings['translation_engines_by_lang_post_type'] : [];
             $combo_models = is_array($settings['translation_models_by_lang_post_type'] ?? null) ? $settings['translation_models_by_lang_post_type'] : [];
             $combo_statuses = is_array($settings['translation_status_by_lang_post_type'] ?? null) ? $settings['translation_status_by_lang_post_type'] : [];
@@ -1067,12 +1067,12 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
             echo '</details>';
 
             echo '<h3>当前路由优先级</h3>';
-            echo '<ol class="wpmu-ml-route-priority"><li>单篇任务手动指定</li><li>目标语言 + 文章类型规则</li><li>目标语言规则</li><li>文章类型规则</li><li>默认翻译引擎</li><li>系统兜底，例如繁体语言可用 OpenCC</li></ol>';
+            echo '<ol class="wpmu-ml-route-priority"><li>单篇任务手动指定</li><li>目标语言 + 文章类型规则</li><li>目标语言规则</li><li>文章类型规则</li><li>默认翻译引擎</li><li>简体中文源站到繁体中文目标站可使用 OpenCC 兜底</li></ol>';
             echo '</div>';
 
             echo '<div class="wpmu-ml-engine-panel' . ($active_tab === 'openai' ? ' is-active' : '') . '" data-panel="openai">';
             echo '<h2>OpenAI 兼容</h2>';
-            echo '<p class="description">OpenAI 兼容引擎现在使用自己的二级选项卡。接口、语言专用配置、内容处理和质检分别维护；共用 Skill、术语库和排除字段仍放在第一层“翻译规则”中。</p>';
+            echo '<p class="description">配置 OpenAI 兼容接口、默认模型、目标语言专用参数、内容处理和质量检查。共用翻译规则、术语库和排除字段在“翻译规则”页维护。</p>';
 
             echo '<div class="wpmu-ml-engine-inner-tabs wpmu-ml-openai-tabs" role="tablist" aria-label="OpenAI 兼容二级选项卡">';
             $openai_inner_tabs = [
@@ -1092,7 +1092,7 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
             echo '<tr><th>API Base URL</th><td><input type="url" name="openai_api_base" value="' . esc_attr($settings['openai_api_base']) . '" class="regular-text" placeholder="https://api.openai.com/v1"><p class="description">兼容 OpenAI Chat Completions 的接口地址，插件会请求 <code>/chat/completions</code>。</p></td></tr>';
             $has_openai_key = trim((string)($settings['openai_api_key'] ?? '')) !== '';
             echo '<tr><th>API Key</th><td><input type="password" name="openai_api_key" value="" class="regular-text" autocomplete="new-password" placeholder="' . ($has_openai_key ? '已保存，留空保持不变' : '尚未设置') . '"><p class="description">当前状态：<strong>' . ($has_openai_key ? '已保存' : '未设置') . '</strong>。留空不会清除旧 Key；只有填写新值才会替换。</p><label><input type="checkbox" name="openai_api_key_clear" value="1"> 明确清除已保存的 API Key</label></td></tr>';
-            echo '<tr><th>默认模型名称</th><td><input type="text" name="openai_model" value="' . esc_attr($settings['openai_model']) . '" class="regular-text" placeholder="gpt-5.5 / your-compatible-model"><p class="description">全局兜底模型。模型优先级为：目标语言 + 文章类型精确覆盖 → 语言设置中的模型 → 文章类型模型 → 这里的默认模型。</p></td></tr>';
+            echo '<tr><th>默认模型名称</th><td><input type="text" name="openai_model" value="' . esc_attr($settings['openai_model']) . '" class="regular-text" placeholder="gpt-4o-mini / your-compatible-model"><p class="description">全局兜底模型。模型优先级为：目标语言 + 文章类型精确覆盖 → 语言设置中的模型 → 文章类型模型 → 这里的默认模型。</p></td></tr>';
             echo '<tr><th>默认 Temperature</th><td><input type="number" step="0.1" min="0" max="2" name="openai_temperature" value="' . esc_attr($settings['openai_temperature']) . '" style="width:90px"><p class="description">建议 0.1 - 0.3。各语言可在“语言设置”中单独覆盖。</p></td></tr>';
             echo '<tr><th>请求超时</th><td><input type="number" min="15" name="openai_timeout" value="' . esc_attr(absint($settings['openai_timeout'])) . '" style="width:100px"> 秒 <p class="description">长文或慢速模型可设 300、600、1800 秒；正式批量建议用 WP-CLI/系统 Cron。</p></td></tr>';
             echo '</tbody></table>';
@@ -1136,7 +1136,7 @@ if (!trait_exists('WPMU_ML_Core_Admin_UI_Trait')) {
                 echo '<div class="wpmu-ml-language-profile__body">';
                 echo '<table class="form-table"><tbody>';
                 echo '<tr><th>目标站</th><td><a href="' . esc_url($openai_site['site_url']) . '" target="_blank">' . esc_html($openai_site['site_url']) . '</a><p class="description">语言标识和 Locale 由语言站点自动读取，这里不重复维护。</p></td></tr>';
-                echo '<tr><th>模型覆盖</th><td><input type="text" class="regular-text" name="openai_language_settings[' . esc_attr($openai_lang) . '][model]" value="' . esc_attr($profile_model) . '" placeholder="留空继承，例如 gpt-5.5"><p class="description">只影响该目标语言。精确的“语言 + 文章类型”模型仍然优先。</p></td></tr>';
+                echo '<tr><th>模型覆盖</th><td><input type="text" class="regular-text" name="openai_language_settings[' . esc_attr($openai_lang) . '][model]" value="' . esc_attr($profile_model) . '" placeholder="留空继承，例如 gpt-4o-mini"><p class="description">只影响该目标语言。精确的“语言 + 文章类型”模型仍然优先。</p></td></tr>';
                 echo '<tr><th>Temperature 覆盖</th><td><input type="number" step="0.1" min="0" max="2" name="openai_language_settings[' . esc_attr($openai_lang) . '][temperature]" value="' . esc_attr($profile_temperature) . '" placeholder="继承" style="width:100px"><p class="description">留空继承 OpenAI 默认 Temperature。</p></td></tr>';
                 echo '<tr><th>语言专用提示词</th><td><textarea name="openai_language_settings[' . esc_attr($openai_lang) . '][prompt]" rows="4" class="large-text" placeholder="建议只写 2～3 句：目标语言自然度、文风和该语言特有的本地化要求。">' . esc_textarea($profile_prompt) . '</textarea><p class="description">保持简短，只负责语言风格。HTML、JSON、URL、数字、占位符、Gutenberg 与写回完整性由代码层统一保护，请勿在这里重复。</p></td></tr>';
                 echo '</tbody></table>';
@@ -1209,7 +1209,7 @@ curl -s -H "Authorization: Bearer TOOLS_KEY" "' . esc_html(home_url('/wp-json/wp
             echo '<p>人工翻译是一个队列状态和人工操作流程，不调用任何模型或外部 Agent。</p>';
             echo '<table class="widefat striped"><thead><tr><th>场景</th><th>说明</th></tr></thead><tbody>';
             echo '<tr><td><code>engine = manual</code></td><td>目标文章由人工编辑或复制粘贴完成，点击“人工完成”后进入 <code>manual_done</code>。</td></tr>';
-            echo '<tr><td>目标文章发布钩子</td><td>v0.8.5 起按引擎区分完成状态，只有 manual 才会被标记为 <code>manual_done</code>，Agent/OpenAI 兼容/OpenCC 不再被覆盖。</td></tr>';
+            echo '<tr><td>目标文章发布状态</td><td>人工流程只在用户确认完成后标记为 <code>manual_done</code>。Agent、OpenAI 兼容和 OpenCC 会保留各自的完成状态。</td></tr>';
             echo '</tbody></table>';
             echo '</div>';
 
@@ -1238,7 +1238,7 @@ LikaCloud | all | LikaCloud">' . esc_textarea($settings['openai_agent_terms'] ??
             echo '<p>队列运行器、批处理数量、锁超时和失败重试仍在“翻译队列”页配置。本页只管理引擎和路由。</p>';
             echo '<table class="widefat striped"><thead><tr><th>概念</th><th>说明</th></tr></thead><tbody>';
             echo '<tr><td>engine</td><td>决定任务由 OpenAI 兼容、Agent API、OpenCC 还是人工处理。</td></tr>';
-            echo '<tr><td>model</td><td>仅对 OpenAI 兼容引擎有意义。后续 TranslationRouteResolver 接入后，任务可拥有自己的模型。</td></tr>';
+            echo '<tr><td>model</td><td>仅对 OpenAI 兼容引擎有意义。可在默认设置、文章类型规则或目标语言规则中指定。</td></tr>';
             echo '<tr><td>Agent API</td><td>模型和执行流程由外部 Agent 管理；内置母语化原则、目标语言标签、共用 Skill、术语库与排除字段由插件统一维护，可通过 <code>/agent/rules</code> 或任务 payload 读取。</td></tr>';
             echo '</tbody></table>';
             echo '</div>';
@@ -1311,7 +1311,7 @@ LikaCloud | all | LikaCloud">' . esc_textarea($settings['openai_agent_terms'] ??
             foreach ($relation_statuses as $value => $label) {
                 echo '<option value="' . esc_attr($value) . '">' . esc_html($label) . '</option>';
             }
-            echo '</select><p class="description">如果只是先发布 zh-hant、后续再 OpenCC，可选“需更新 needs_update”；如果是英文根站先隐藏，可选“未翻译 needs_translation”。</p></td></tr>';
+            echo '</select><p class="description">选择当前关系的处理状态。未翻译内容可选 <code>needs_translation</code>；已发布但需要同步或复核的内容可选 <code>needs_update</code>。</p></td></tr>';
 
             echo '<tr><th>文章类型</th><td>';
             if ($managed_post_types) {
@@ -1332,11 +1332,9 @@ LikaCloud | all | LikaCloud">' . esc_textarea($settings['openai_agent_terms'] ??
 
             echo '<div class="wpmu-ml-card" style="max-width:1100px">';
             echo '<h3>初始化检查工具</h3>';
-            echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" onsubmit="return confirm(\'该工具只会根据相同 ID 补建草稿，不会复制全部历史字段。确定执行？\');">';
-            echo '<input type="hidden" name="action" value="wpmu_ml_sync_same_id_drafts">';
-            wp_nonce_field(self::NONCE_ACTION, self::NONCE_NAME);
-            submit_button('根据源站 ID 检查目标站缺失文章', 'secondary');
-            echo '</form>';
+            echo '<p class="description">同 ID 猜测补建工具已停用。需要检查或修复关系时，请使用只读审计和严格来源 meta 恢复预览。</p>';
+            echo '<p><code>wp wpmu-ml audit-relations --summary --allow-root --skip-themes</code></p>';
+            echo '<p><code>wp wpmu-ml reconcile-relations --target_blog_id=目标站ID --limit=500 --allow-root --skip-themes</code></p>';
             echo '</div>';
         }
 
@@ -1413,8 +1411,8 @@ wp wpmu-ml doctor --job_id=62 --allow-root --skip-themes
 wp wpmu-ml job --job_id=62 --allow-root --skip-themes
 wp wpmu-ml translate --job_id=62 --allow-root --skip-themes</pre>';
 
-            echo '<h3>更新维护要求</h3>';
-            echo '<div class="notice notice-info inline"><p>从 v0.7.2 起，每次更新插件源码时，必须同步更新 <code>docs/README.md</code> 的版本号、版本记录、功能说明和使用注意事项。README 是换会话、换环境继续维护时的主说明文件。</p></div>';
+            echo '<h3>文档与支持</h3>';
+            echo '<div class="notice notice-info inline"><p>插件文档、更新记录和测试报告位于插件目录的 <code>docs/</code> 文件夹。排查问题时建议先运行上方诊断命令，并记录相关任务 ID、目标语言和错误信息。</p></div>';
         }
 
         private function get_environment_checks()
@@ -1504,7 +1502,7 @@ wp wpmu-ml translate --job_id=62 --allow-root --skip-themes</pre>';
                 return [
                     'status' => $opencc_required ? 'bad' : 'warn',
                     'value' => 'shell_exec 被禁用，无法检测 opencc' . ($opencc_required ? '（当前路由需要 OpenCC）' : '（当前路由未使用 OpenCC）'),
-                    'help' => '需要在 PHP 配置中允许 shell_exec，或后续改造为 PHP OpenCC 扩展/服务化接口。',
+                    'help' => '需要在 PHP 配置中允许 shell_exec，或改用 OpenAI 兼容、Agent API、人工翻译等不依赖 OpenCC 的路线。',
                     'test_status' => $opencc_required ? 'bad' : 'warn',
                     'test_value' => '无法测试',
                     'test_help' => 'OpenCC 转换依赖 shell_exec。',

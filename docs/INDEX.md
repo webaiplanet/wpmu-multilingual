@@ -13,6 +13,7 @@
 ## 当前重点文档
 
 - Term 增删改同步需求：`plans/TERM_SYNC_REQUIREMENTS.md`
+- 0.9.8.12 后台 UI 文案清理报告：`reports/WPMU多语言插件_0.9.8.12_后台UI文案清理报告_20260724.md`
 - 0.9.8.11 OpenCC 源语言保护报告：`reports/WPMU多语言插件_0.9.8.11_OpenCC源语言保护报告_20260724.md`
 - 0.9.8.10 未发布语言配置清理报告：`reports/WPMU多语言插件_0.9.8.10_未发布语言配置清理报告_20260724.md`
 - 0.9.8.9 taxonomy term 翻译开关报告：`reports/WPMU多语言插件_0.9.8.9_taxonomy-term翻译开关处理报告_20260724.md`
