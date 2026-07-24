@@ -1,3 +1,9 @@
+## 0.9.8.18 - 2026-07-24
+
+- 语言切换器“目标语言版本暂未发布”弹窗新增夜间模式颜色。
+- 保持原有白天样式不变，使用 CSS 变量切换弹窗背景、标题、正文、关闭按钮、图标和遮罩颜色。
+- 兼容系统 `prefers-color-scheme: dark`，并支持常见主题/夜间插件使用的 `html/body.dark`、`dark-mode`、`theme-dark`、`is-dark-theme`、`wp-dark-mode-active`、`[data-theme="dark"]`、`[data-bs-theme="dark"]` 等切换规则。
+
 ## 0.9.8.17 - 2026-07-24
 
 - Agent API payload 新增 `field_scope=gutenberg` 字段，单独暴露 Gutenberg / ACF block 注释 JSON 中的人类可读文本。

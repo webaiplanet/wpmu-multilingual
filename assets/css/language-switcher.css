@@ -29,6 +29,16 @@ a[data-wpmu-ml-unavailable="1"] {
 }
 
 .wpmu-ml-language-notice-modal {
+    --wpmu-ml-notice-overlay: rgba(15, 23, 42, .48);
+    --wpmu-ml-notice-dialog-bg: #fff;
+    --wpmu-ml-notice-dialog-color: #1f2937;
+    --wpmu-ml-notice-dialog-shadow: 0 24px 70px rgba(15, 23, 42, .24);
+    --wpmu-ml-notice-icon-bg: #fff3ed;
+    --wpmu-ml-notice-icon-color: #ff4d36;
+    --wpmu-ml-notice-title-color: #111827;
+    --wpmu-ml-notice-text-color: #4b5563;
+    --wpmu-ml-notice-close-bg: #f3f4f6;
+    --wpmu-ml-notice-close-color: #4b5563;
     position: fixed;
     inset: 0;
     z-index: 999999;
@@ -36,7 +46,7 @@ a[data-wpmu-ml-unavailable="1"] {
     align-items: center;
     justify-content: center;
     padding: 24px;
-    background: rgba(15, 23, 42, .48);
+    background: var(--wpmu-ml-notice-overlay);
     backdrop-filter: blur(4px);
 }
 
@@ -48,9 +58,10 @@ a[data-wpmu-ml-unavailable="1"] {
     position: relative;
     width: min(440px, 100%);
     border-radius: 18px;
-    background: #fff;
-    color: #1f2937;
-    box-shadow: 0 24px 70px rgba(15, 23, 42, .24);
+    background: var(--wpmu-ml-notice-dialog-bg);
+    color: var(--wpmu-ml-notice-dialog-color);
+    box-shadow: var(--wpmu-ml-notice-dialog-shadow);
+    color-scheme: light;
     padding: 34px 32px 28px;
     text-align: center;
     transform: translateY(8px) scale(.98);
@@ -65,8 +76,8 @@ a[data-wpmu-ml-unavailable="1"] {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #fff3ed;
-    color: #ff4d36;
+    background: var(--wpmu-ml-notice-icon-bg);
+    color: var(--wpmu-ml-notice-icon-color);
     font-size: 28px;
     line-height: 1;
     font-weight: 700;
@@ -74,7 +85,7 @@ a[data-wpmu-ml-unavailable="1"] {
 
 .wpmu-ml-language-notice-title {
     margin: 0 0 10px;
-    color: #111827;
+    color: var(--wpmu-ml-notice-title-color);
     font-size: 22px;
     line-height: 1.35;
     font-weight: 700;
@@ -82,7 +93,7 @@ a[data-wpmu-ml-unavailable="1"] {
 
 .wpmu-ml-language-notice-text {
     margin: 0;
-    color: #4b5563;
+    color: var(--wpmu-ml-notice-text-color);
     font-size: 15px;
     line-height: 1.75;
 }
@@ -118,9 +129,75 @@ a[data-wpmu-ml-unavailable="1"] {
     width: 34px;
     height: 34px;
     padding: 0;
-    background: #f3f4f6;
-    color: #4b5563;
+    background: var(--wpmu-ml-notice-close-bg);
+    color: var(--wpmu-ml-notice-close-color);
     font-size: 20px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .wpmu-ml-language-notice-modal {
+        --wpmu-ml-notice-overlay: rgba(2, 6, 23, .72);
+        --wpmu-ml-notice-dialog-bg: #111827;
+        --wpmu-ml-notice-dialog-color: #e5e7eb;
+        --wpmu-ml-notice-dialog-shadow: 0 24px 80px rgba(0, 0, 0, .52);
+        --wpmu-ml-notice-icon-bg: rgba(255, 77, 54, .14);
+        --wpmu-ml-notice-icon-color: #ff755f;
+        --wpmu-ml-notice-title-color: #f9fafb;
+        --wpmu-ml-notice-text-color: #cbd5e1;
+        --wpmu-ml-notice-close-bg: #1f2937;
+        --wpmu-ml-notice-close-color: #e5e7eb;
+    }
+
+    .wpmu-ml-language-notice-dialog {
+        color-scheme: dark;
+    }
+}
+
+html.dark .wpmu-ml-language-notice-modal,
+html.dark-mode .wpmu-ml-language-notice-modal,
+html.theme-dark .wpmu-ml-language-notice-modal,
+html.is-dark .wpmu-ml-language-notice-modal,
+html.is-dark-theme .wpmu-ml-language-notice-modal,
+html.wp-dark-mode-active .wpmu-ml-language-notice-modal,
+body.dark .wpmu-ml-language-notice-modal,
+body.dark-mode .wpmu-ml-language-notice-modal,
+body.theme-dark .wpmu-ml-language-notice-modal,
+body.is-dark .wpmu-ml-language-notice-modal,
+body.is-dark-theme .wpmu-ml-language-notice-modal,
+body.wp-dark-mode-active .wpmu-ml-language-notice-modal,
+[data-theme="dark"] .wpmu-ml-language-notice-modal,
+[data-color-scheme="dark"] .wpmu-ml-language-notice-modal,
+[data-bs-theme="dark"] .wpmu-ml-language-notice-modal,
+[data-mode="dark"] .wpmu-ml-language-notice-modal {
+    --wpmu-ml-notice-overlay: rgba(2, 6, 23, .72);
+    --wpmu-ml-notice-dialog-bg: #111827;
+    --wpmu-ml-notice-dialog-color: #e5e7eb;
+    --wpmu-ml-notice-dialog-shadow: 0 24px 80px rgba(0, 0, 0, .52);
+    --wpmu-ml-notice-icon-bg: rgba(255, 77, 54, .14);
+    --wpmu-ml-notice-icon-color: #ff755f;
+    --wpmu-ml-notice-title-color: #f9fafb;
+    --wpmu-ml-notice-text-color: #cbd5e1;
+    --wpmu-ml-notice-close-bg: #1f2937;
+    --wpmu-ml-notice-close-color: #e5e7eb;
+}
+
+html.dark .wpmu-ml-language-notice-dialog,
+html.dark-mode .wpmu-ml-language-notice-dialog,
+html.theme-dark .wpmu-ml-language-notice-dialog,
+html.is-dark .wpmu-ml-language-notice-dialog,
+html.is-dark-theme .wpmu-ml-language-notice-dialog,
+html.wp-dark-mode-active .wpmu-ml-language-notice-dialog,
+body.dark .wpmu-ml-language-notice-dialog,
+body.dark-mode .wpmu-ml-language-notice-dialog,
+body.theme-dark .wpmu-ml-language-notice-dialog,
+body.is-dark .wpmu-ml-language-notice-dialog,
+body.is-dark-theme .wpmu-ml-language-notice-dialog,
+body.wp-dark-mode-active .wpmu-ml-language-notice-dialog,
+[data-theme="dark"] .wpmu-ml-language-notice-dialog,
+[data-color-scheme="dark"] .wpmu-ml-language-notice-dialog,
+[data-bs-theme="dark"] .wpmu-ml-language-notice-dialog,
+[data-mode="dark"] .wpmu-ml-language-notice-dialog {
+    color-scheme: dark;
 }
 
 @keyframes wpmuMlLanguageNoticeIn {
